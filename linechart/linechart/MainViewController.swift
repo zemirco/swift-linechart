@@ -41,7 +41,7 @@ class MainViewController: UIViewController, LineChartDelegate {
     
     
     func didSelectDataPoint(x: CGFloat, yValueDataA: CGFloat, yValueDataB: CGFloat) {
-        label.text = "x: \(x)     y_a: \(yValueDataA)     y_b: \(yValueDataB)"
+        label.text = "x: \(x)     ya: \(yValueDataA)     yb: \(yValueDataB)"
     }
 
 }

@@ -1,9 +1,15 @@
 
 import UIKit
+import QuartzCore
 
 class MainViewController: UIViewController, LineChartDelegate {
 
+    
+    
     var label = UILabel()
+    var lineChart: LineChart?
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,13 +24,12 @@ class MainViewController: UIViewController, LineChartDelegate {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[label]-|", options: nil, metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-80-[label]", options: nil, metrics: nil, views: views))
         
+        var data: Array<CGFloat> = [3, 4, 9, 11, 13, 15]
         
-        var dataLineA: Array<CGFloat> = [3, 4, 9, 11, 13, 15]
-        var dataLineB: Array<CGFloat> = [5, 4, 3, 6, 6, 7]
-        
-        var lineChart = LineChart(dataLineA: dataLineA, dataLineB: dataLineB)
-        lineChart.setTranslatesAutoresizingMaskIntoConstraints(false)
-        lineChart.delegate = self
+        lineChart = LineChart()
+        lineChart!.addLine(data)
+        lineChart!.setTranslatesAutoresizingMaskIntoConstraints(false)
+        lineChart!.delegate = self
         self.view.addSubview(lineChart)
         views["chart"] = lineChart
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[chart]-|", options: nil, metrics: nil, views: views))
@@ -40,8 +45,22 @@ class MainViewController: UIViewController, LineChartDelegate {
     
     
     
-    func didSelectDataPoint(x: CGFloat, yValueDataA: CGFloat, yValueDataB: CGFloat) {
-        label.text = "x: \(x)     ya: \(yValueDataA)     yb: \(yValueDataB)"
+    /**
+     * Line chart delegate method.
+     */
+    func didSelectDataPoint(x: CGFloat, yValues: Array<CGFloat>) {
+        label.text = "x: \(x)     y: \(yValues)"
+    }
+    
+    
+    
+    /**
+     * Redraw chart on device rotation.
+     */
+    override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
+        if let chart = lineChart {
+            chart.setNeedsDisplay()
+        }
     }
 
 }

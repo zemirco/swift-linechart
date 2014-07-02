@@ -12,6 +12,7 @@
 		C06F8E291962FFD7000AC9AF /* linechartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06F8E281962FFD7000AC9AF /* linechartTests.swift */; };
 		C06F8E331962FFEC000AC9AF /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06F8E321962FFEC000AC9AF /* MainViewController.swift */; };
 		C06F8E3519630045000AC9AF /* LineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06F8E3419630045000AC9AF /* LineChart.swift */; };
+		C09A3A76196405FA00D3F98D /* DotCALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09A3A75196405FA00D3F98D /* DotCALayer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,7 @@
 		C06F8E281962FFD7000AC9AF /* linechartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = linechartTests.swift; sourceTree = "<group>"; };
 		C06F8E321962FFEC000AC9AF /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		C06F8E3419630045000AC9AF /* LineChart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineChart.swift; sourceTree = "<group>"; };
+		C09A3A75196405FA00D3F98D /* DotCALayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DotCALayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 				C06F8E1A1962FFD7000AC9AF /* AppDelegate.swift */,
 				C06F8E321962FFEC000AC9AF /* MainViewController.swift */,
 				C06F8E3419630045000AC9AF /* LineChart.swift */,
+				C09A3A75196405FA00D3F98D /* DotCALayer.swift */,
 				C06F8E1C1962FFD7000AC9AF /* Images.xcassets */,
 				C06F8E181962FFD7000AC9AF /* Supporting Files */,
 			);
@@ -209,6 +212,7 @@
 				C06F8E1B1962FFD7000AC9AF /* AppDelegate.swift in Sources */,
 				C06F8E331962FFEC000AC9AF /* MainViewController.swift in Sources */,
 				C06F8E3519630045000AC9AF /* LineChart.swift in Sources */,
+				C09A3A76196405FA00D3F98D /* DotCALayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +389,7 @@
 				C06F8E2E1962FFD7000AC9AF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C06F8E2F1962FFD7000AC9AF /* Build configuration list for PBXNativeTarget "linechartTests" */ = {
 			isa = XCConfigurationList;
@@ -393,6 +398,7 @@
 				C06F8E311962FFD7000AC9AF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

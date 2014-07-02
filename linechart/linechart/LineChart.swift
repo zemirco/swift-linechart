@@ -20,7 +20,7 @@ import QuartzCore
 
 // delegate method
 @objc protocol LineChartDelegate {
-    func didSelectDataPoint(x: CGFloat, yValueDataA: CGFloat, yValueDataB: CGFloat)
+    func didSelectDataPoint(x: CGFloat, yValues: Array<CGFloat>)
 }
 
 
@@ -28,53 +28,45 @@ import QuartzCore
 // LineChart class
 class LineChart: UIControl {
     
+    // default configuration
+    var gridVisible = true
+    var axesVisible = true
+    var dotsVisible = true
+    var numberOfGridLinesX: CGFloat = 10
+    var numberOfGridLinesY: CGFloat = 10
     
-    
-    // colors (from google ui color palette)
-    
-    // Blue Grey 500 - #607d8b
-    var axesColor = UIColor(red: 96/255.0, green: 125/255.0, blue: 139/255.0, alpha: 1)
-    var dotsColor = UIColor(red: 96/255.0, green: 125/255.0, blue: 139/255.0, alpha: 1)
     var dotsBackgroundColor = UIColor.whiteColor()
     
-    var lineWidth: CGFloat = 4
+    // #eeeeee
+    var gridColor = UIColor(red: 238/255.0, green: 238/255.0, blue: 238/255.0, alpha: 1)
     
-    // Teal 500 - #009688
-    var lineAColor = UIColor(red: 0/255.0, green: 150/255.0, blue: 136/255.0, alpha: 1)
-    // Teal 700 - #00796b
-    var dotsAColor = UIColor(red: 0/255.0, green: 121/255.0, blue: 107/255.0, alpha: 1)
+    // #607d8b
+    var axesColor = UIColor(red: 96/255.0, green: 125/255.0, blue: 139/255.0, alpha: 1)
     
-    // Purple 500 - #9c27b0
-    var lineBColor = UIColor(red: 156/255.0, green: 39/255.0, blue: 176/255.0, alpha: 1)
-    // Purple 700 - #7b1fa2
-    var dotsBColor = UIColor(red: 123/255.0, green: 31/255.0, blue: 162/255.0, alpha: 1)
-    
-    // Red 200 - #f69988
+    // #f69988
     var positiveAreaColor = UIColor(red: 246/255.0, green: 153/255.0, blue: 136/255.0, alpha: 1)
     
-    // Green 200 - #72d572
+    // #72d572
     var negativeAreaColor = UIColor(red: 114/255.0, green: 213/255.0, blue: 114/255.0, alpha: 1)
     
-    
+    var areaBetweenLines = [-1, -1]
     
     // sizes
-    
-    // space between axis and view border
+    var lineWidth: CGFloat = 2
+    var dotsSize: CGFloat = 12
+    var dotsBorderWidth: CGFloat = 4
     var axisInset: CGFloat = 10
     
-    // height and width for drawing data area
+    // values calculated on init
     var drawingHeight: CGFloat = 0
     var drawingWidth: CGFloat = 0
     
-    var maximumYValue: CGFloat = 1
-    
-    var dataLineA: Array<CGFloat> = []
-    var dataLineB: Array<CGFloat> = []
-    
-    var dotsDataA: Array<CALayer> = []
-    var dotsDataB: Array<CALayer> = []
-    
     var delegate: LineChartDelegate?
+    
+    // data stores
+    var dataStore: Array<Array<CGFloat>> = []
+    var dotsDataStore: Array<Array<DotCALayer>> = []
+    var colors: Array<UIColor> = []
     
     
     
@@ -85,37 +77,88 @@ class LineChart: UIControl {
     
     
     
-    convenience init(dataLineA: Array<CGFloat>, dataLineB: Array<CGFloat>) {
+    convenience init() {
         self.init(frame: CGRectZero)
-        self.dataLineA = dataLineA
-        self.dataLineB = dataLineB
-        self.maximumYValue = getMaximumValue(dataLineA, dataLineB: dataLineB)
     }
     
     
     
     override func drawRect(rect: CGRect) {
         
+        // category10 colors from d3 - https://github.com/mbostock/d3/wiki/Ordinal-Scales
+        self.colors = [
+            UIColorFromHex(0x1f77b4),
+            UIColorFromHex(0xff7f0e),
+            UIColorFromHex(0x2ca02c),
+            UIColorFromHex(0xd62728),
+            UIColorFromHex(0x9467bd),
+            UIColorFromHex(0x8c564b),
+            UIColorFromHex(0xe377c2),
+            UIColorFromHex(0x7f7f7f),
+            UIColorFromHex(0xbcbd22),
+            UIColorFromHex(0x17becf)
+        ]
+        
         self.drawingHeight = self.bounds.height - (2 * axisInset)
         self.drawingWidth = self.bounds.width - (2 * axisInset)
         
+        // remove all dots on device rotation
+        if dotsDataStore.count > 0 {
+            for dotsData in dotsDataStore {
+                for dot in dotsData {
+                    dot.removeFromSuperlayer()
+                }
+            }
+            dotsDataStore.removeAll()
+        }
+        
+        // draw grid
+        if gridVisible { drawGrid() }
+        
         // draw axes
-        drawAxes()
+        if axesVisible { drawAxes() }
         
-        // line A
-        var scaledDataLineAXAxis = scaleDataXAxis(dataLineA)
-        var scaledDataLineAYAxis = scaleDataYAxis(dataLineA)
-        drawLine(scaledDataLineAXAxis, yAxis: scaledDataLineAYAxis, dataIdentifier: "A")
-        drawDataDots(scaledDataLineAXAxis, yAxis: scaledDataLineAYAxis, dataIdentifier: "A")
+        // draw filled area between charts
+        if areaBetweenLines[0] > -1 && areaBetweenLines[1] > -1 {
+            drawAreaBetweenLineCharts()
+        }
         
-        // line B
-        var scaledDataLineBXAxis = scaleDataXAxis(dataLineB)
-        var scaledDataLineBYAxis = scaleDataYAxis(dataLineB)
-        drawLine(scaledDataLineBXAxis, yAxis: scaledDataLineBYAxis, dataIdentifier: "B")
-        drawDataDots(scaledDataLineBXAxis, yAxis: scaledDataLineBYAxis, dataIdentifier: "B")
-        
-        // draw area chart
-        drawAreaBetweenLineCharts(scaledDataLineAXAxis, yAxisDataA: scaledDataLineAYAxis, yAxisDataB: scaledDataLineBYAxis)
+        // draw lines
+        for (lineIndex, lineData) in enumerate(dataStore) {
+            var scaledDataXAxis = scaleDataXAxis(lineData)
+            var scaledDataYAxis = scaleDataYAxis(lineData)
+            drawLine(scaledDataXAxis, yAxis: scaledDataYAxis, lineIndex: lineIndex)
+            
+            // draw dots
+            if dotsVisible { drawDataDots(scaledDataXAxis, yAxis: scaledDataYAxis, lineIndex: lineIndex) }
+        }
+
+    }
+    
+    
+    
+    /**
+     * Convert hex color to UIColor
+     */
+    func UIColorFromHex(hex: Int) -> UIColor {
+        var red = CGFloat((hex & 0xFF0000) >> 16) / 255.0
+        var green = CGFloat((hex & 0xFF00) >> 8) / 255.0
+        var blue = CGFloat((hex & 0xFF)) / 255.0
+        return UIColor(red: red, green: green, blue: blue, alpha: 1)
+    }
+    
+    
+    
+    /** 
+     * Lighten color.
+     */
+    func lightenUIColor(color: UIColor) -> UIColor {
+        var h: CGFloat = 0
+        var s: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        color.getHue(&h, saturation: &s, brightness: &b, alpha: &a)
+        return UIColor(hue: h, saturation: s, brightness: b * 1.5, alpha: a)
     }
     
     
@@ -123,14 +166,18 @@ class LineChart: UIControl {
     /**
      * Get y value for given x value. Or return zero or maximum value.
      */
-    func getYValueForXValue(x: CGFloat, data: Array<CGFloat>) -> CGFloat {
-        if x < 0 {
-            return data[0]
-        } else if Int(x) > data.count - 1 {
-            return data[data.count - 1]
-        } else {
-            return data[Int(x)]
+    func getYValuesForXValue(x: Int) -> Array<CGFloat> {
+        var result: Array<CGFloat> = []
+        for lineData in dataStore {
+            if x < 0 {
+                result.append(lineData[0])
+            } else if x > lineData.count - 1 {
+                result.append(lineData[lineData.count - 1])
+            } else {
+                result.append(lineData[x])
+            }
         }
+        return result
     }
     
     
@@ -142,10 +189,9 @@ class LineChart: UIControl {
         var point: AnyObject! = touches.anyObject()
         var xValue = point.locationInView(self).x
         var closestXValueIndex = findClosestXValueInData(xValue)
-        var yValueDataA = getYValueForXValue(CGFloat(closestXValueIndex), data: dataLineA)
-        var yValueDataB = getYValueForXValue(CGFloat(closestXValueIndex), data: dataLineB)
-        highlightDataPoint(closestXValueIndex)
-        delegate?.didSelectDataPoint(CGFloat(closestXValueIndex), yValueDataA: yValueDataA, yValueDataB: yValueDataB)
+        var yValues: Array<CGFloat> = getYValuesForXValue(closestXValueIndex)
+        highlightDataPoints(closestXValueIndex)
+        delegate?.didSelectDataPoint(CGFloat(closestXValueIndex), yValues: yValues)
     }
     
     
@@ -172,7 +218,7 @@ class LineChart: UIControl {
      * Find closest value on x axis.
      */
     func findClosestXValueInData(xValue: CGFloat) -> Int {
-        var scaledDataXAxis = scaleDataXAxis(dataLineA)
+        var scaledDataXAxis = scaleDataXAxis(dataStore[0])
         var difference = scaledDataXAxis[1] - scaledDataXAxis[0]
         var dividend = (xValue - axisInset) / difference
         var roundedDividend = Int(round(Double(dividend)))
@@ -184,27 +230,23 @@ class LineChart: UIControl {
     /**
      * Highlight data points at index.
      */
-    func highlightDataPoint(index: Int) {
-        // make all white again
-        for index in 0..dotsDataA.count {
-            dotsDataA[index].backgroundColor = dotsBackgroundColor.CGColor
-            dotsDataB[index].backgroundColor = dotsBackgroundColor.CGColor
+    func highlightDataPoints(index: Int) {
+        for (lineIndex, dotsData) in enumerate(dotsDataStore) {
+            // make all dots white again
+            for dot in dotsData {
+                dot.backgroundColor = dotsBackgroundColor.CGColor
+            }
+            // highlight current data point
+            var dot: DotCALayer
+            if index < 0 {
+                dot = dotsData[0]
+            } else if index > dotsData.count - 1 {
+                dot = dotsData[dotsData.count - 1]
+            } else {
+                dot = dotsData[index]
+            }
+            dot.backgroundColor = lightenUIColor(colors[lineIndex]).CGColor
         }
-        // highlight current data point
-        var dotALayer: CALayer
-        var dotBLayer: CALayer
-        if index < 0 {
-            dotALayer = dotsDataA[0]
-            dotBLayer = dotsDataB[0]
-        } else if index > dotsDataA.count - 1 {
-            dotALayer = dotsDataA[dotsDataA.count - 1]
-            dotBLayer = dotsDataB[dotsDataB.count - 1]
-        } else {
-            dotALayer = dotsDataA[index]
-            dotBLayer = dotsDataB[index]
-        }
-        dotALayer.backgroundColor = dotsAColor.CGColor
-        dotBLayer.backgroundColor = dotsBColor.CGColor
     }
     
     
@@ -212,35 +254,23 @@ class LineChart: UIControl {
     /**
      * Draw small dot at every data point.
      */
-    func drawDataDots(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, dataIdentifier: String) {
-        var size: CGFloat = 12
+    func drawDataDots(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, lineIndex: Int) {
+        var dots: Array<DotCALayer> = []
         for index in 0..xAxis.count {
-            var xValue = xAxis[index] + axisInset - size/2
-            var yValue = self.bounds.height - yAxis[index] - axisInset - size/2
+            var xValue = xAxis[index] + axisInset - dotsSize/2
+            var yValue = self.bounds.height - yAxis[index] - axisInset - dotsSize/2
             
-            // draw white layer
-            var whiteLayer = CALayer()
-            whiteLayer.backgroundColor = dotsBackgroundColor.CGColor
-            whiteLayer.cornerRadius = size / 2
-            whiteLayer.frame = CGRect(x: xValue, y: yValue, width: size, height: size)
-            
-            // draw black layer on top because just using one layer causes weird border issues
-            var borderWidth: CGFloat = 4
-            var blackLayerSize = size - borderWidth
-            var blackLayer = CALayer()
-            blackLayer.backgroundColor = dotsColor.CGColor
-            blackLayer.cornerRadius = blackLayerSize / 2
-            blackLayer.frame = CGRect(x: xValue + (borderWidth/2), y: yValue + (borderWidth/2), width: blackLayerSize, height: blackLayerSize)
-            
-            // add both layers to view
-            self.layer.addSublayer(whiteLayer)
-            self.layer.addSublayer(blackLayer)
-            if dataIdentifier == "A" {
-                dotsDataA.append(whiteLayer)
-            } else if dataIdentifier == "B" {
-                dotsDataB.append(whiteLayer)
-            }
+            // draw custom layer with another layer in the center
+            var dotLayer = DotCALayer()
+            dotLayer.dotInnerColor = colors[lineIndex]
+            dotLayer.dotBorderWith = dotsBorderWidth
+            dotLayer.backgroundColor = dotsBackgroundColor.CGColor
+            dotLayer.cornerRadius = dotsSize / 2
+            dotLayer.frame = CGRect(x: xValue, y: yValue, width: dotsSize, height: dotsSize)
+            self.layer.addSublayer(dotLayer)
+            dots.append(dotLayer)
         }
+        dotsDataStore.append(dots)
     }
     
     
@@ -266,16 +296,17 @@ class LineChart: UIControl {
     
     
     /**
-     * Get maximum value in both Arrays.
+     * Get maximum value in all arrays in data store.
      */
-    func getMaximumValue(dataLineA: Array<CGFloat>, dataLineB: Array<CGFloat>) -> CGFloat {
-        var dataLine1Maximum = dataLineA.reduce(Int.min, { max(Int($0), Int($1)) })
-        var dataLine2Maximum = dataLineB.reduce(Int.min, { max(Int($0), Int($1)) })
-        if dataLine1Maximum >= dataLine2Maximum {
-            return CGFloat(dataLine1Maximum)
-        } else {
-            return CGFloat(dataLine2Maximum)
+    func getMaximumValue() -> CGFloat {
+        var maximum = 0
+        for data in dataStore {
+            var newMaximum = data.reduce(Int.min, { max(Int($0), Int($1)) })
+            if newMaximum > maximum {
+                maximum = newMaximum
+            }
         }
+        return CGFloat(maximum)
     }
     
     
@@ -299,6 +330,7 @@ class LineChart: UIControl {
      * Scale data to fit drawing height.
      */
     func scaleDataYAxis(data: Array<CGFloat>) -> Array<CGFloat> {
+        var maximumYValue = getMaximumValue()
         var factor = drawingHeight / maximumYValue
         var scaledDataYAxis = data.map({datum -> CGFloat in
             var newYValue = datum * factor
@@ -312,17 +344,11 @@ class LineChart: UIControl {
     /**
      * Draw line.
      */
-    func drawLine(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, dataIdentifier: String) {
+    func drawLine(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, lineIndex: Int) {
         var context = UIGraphicsGetCurrentContext()
         CGContextSetLineWidth(context, lineWidth)
-        if dataIdentifier == "A" {
-            CGContextSetStrokeColorWithColor(context, lineAColor.CGColor)
-        } else if dataIdentifier == "B" {
-            CGContextSetStrokeColorWithColor(context, lineBColor.CGColor)
-        }
-        // move to first data point
+        CGContextSetStrokeColorWithColor(context, colors[lineIndex].CGColor)
         CGContextMoveToPoint(context, axisInset, self.bounds.height - yAxis[0] - axisInset)
-        // draw lines to rest of data points
         for index in 1..xAxis.count {
             var xValue = xAxis[index] + axisInset
             var yValue = self.bounds.height - yAxis[index] - axisInset
@@ -336,12 +362,13 @@ class LineChart: UIControl {
     /**
      * Fill area between charts.
      */
-    func drawAreaBetweenLineCharts(xAxis: Array<CGFloat>, yAxisDataA: Array<CGFloat>, yAxisDataB: Array<CGFloat>) {
+    func drawAreaBetweenLineCharts() {
         
-        // calculate difference between y values
+        var xAxis = scaleDataXAxis(dataStore[0])
+        var yAxisDataA = scaleDataYAxis(dataStore[areaBetweenLines[0]])
+        var yAxisDataB = scaleDataYAxis(dataStore[areaBetweenLines[1]])
         var difference = yAxisDataA - yAxisDataB
         
-        // draw graph in sections
         for index in 0..xAxis.count-1 {
             
             var context = UIGraphicsGetCurrentContext()
@@ -361,17 +388,66 @@ class LineChart: UIControl {
             var point4XValue = xAxis[index+1] + axisInset
             var point4YValue = self.bounds.height - yAxisDataA[index+1] - axisInset
             
-            // draw section
             CGContextMoveToPoint(context, point1XValue, point1YValue)
             CGContextAddLineToPoint(context, point2XValue, point2YValue)
             CGContextAddLineToPoint(context, point3XValue, point3YValue)
             CGContextAddLineToPoint(context, point4XValue, point4YValue)
             CGContextAddLineToPoint(context, point1XValue, point1YValue)
-            
             CGContextFillPath(context)
             
         }
         
+    }
+    
+    
+    
+    /**
+     * Draw x grid.
+     */
+    func drawXGrid() {
+        var space = drawingWidth / numberOfGridLinesX
+        var context = UIGraphicsGetCurrentContext()
+        CGContextSetStrokeColorWithColor(context, gridColor.CGColor)
+        for index in 1...numberOfGridLinesX {
+            CGContextMoveToPoint(context, axisInset + (index * space), self.bounds.height - axisInset)
+            CGContextAddLineToPoint(context, axisInset + (index * space), axisInset)
+        }
+        CGContextStrokePath(context)
+    }
+    
+    
+    
+    /**
+     * Draw y grid.
+     */
+    func drawYGrid() {
+        var space = drawingHeight / numberOfGridLinesY
+        var context = UIGraphicsGetCurrentContext()
+        for index in 1...numberOfGridLinesY {
+            CGContextMoveToPoint(context, axisInset, self.bounds.height - (index * space) - axisInset)
+            CGContextAddLineToPoint(context, self.bounds.width - axisInset, self.bounds.height - (index * space) - axisInset)
+        }
+        CGContextStrokePath(context)
+    }
+    
+    
+    
+    /**
+     * Draw grid.
+     */
+    func drawGrid() {
+        drawXGrid()
+        drawYGrid()
+    }
+    
+    
+    
+    /**
+     * Add line chart
+     */
+    func addLine(data: Array<CGFloat>) {
+        self.dataStore.append(data)
+        self.setNeedsDisplay()
     }
     
 }

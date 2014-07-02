@@ -1,3 +1,5 @@
 .DS_Store
 gif.gif
 video.mov
+*.gif
+screenshots/

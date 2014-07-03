@@ -1,6 +1,6 @@
 # Swift LineChart
 
-![line chart demo](https://s3.amazonaws.com/zeMirco/github/swift-linechart/gif20.gif)
+![line chart demo](https://s3.amazonaws.com/zeMirco/github/swift-linechart/gif30.gif)
 
 ## Usage
 
@@ -22,8 +22,12 @@ lineChart.addLine([3, 4, 9, 11, 13, 15])
 - `gridVisible` Show or hide grid. Default `true`.
 - `axesVisible` Show or hide x and y axes. Default `true`.
 - `dotsVisible` Show tiny dots at data points. Default `true`.
+- `labelsXVisible` Show labels on x axis. Default `false`.
+- `labelsYVisible` Show labels on y axis. Default `false`.
 - `numberOfGridLinesX` Number of grid lines in horizontal direction. Default `10`.
 - `numberOfGridLinesY` Number of grid lines in vertical direction. Default `10`.
+- `animationEnabled` Draw line and dots with animation. Default `true`.
+- `animationDuration` Animation duration. Default `1`.
 - `dotsBackgroundColor` Tiny dots background color. Default white.
 - `gridColor` Grid color. Default light grey.
 - `axesColor` Axes color. Default grey.
@@ -87,6 +91,22 @@ lineChart.addLine([3, 4, 9, 11, 13, 15])
 lineChart.addLine([5, 4, 3, 6, 6, 7])
 lineChart.areaBetweenLines = [0, 1]
 ```
+
+#### Show x and y axis
+
+![chart with x and y axis](https://s3.amazonaws.com/zeMirco/github/swift-linechart/04.png)
+
+```swift
+var lineChart = LineChart()
+lineChart.addLine([3, 4, 9, 11, 13, 15])
+lineChart.addLine([5, 4, 3, 6, 6, 7])
+lineChart.axisInset = 20
+lineChart.labelsXVisible = true
+lineChart.numberOfGridLinesX = 5
+lineChart.labelsYVisible = true
+lineChart.numberOfGridLinesY = 5
+```
+
 
 ## License
 

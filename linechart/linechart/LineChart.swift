@@ -108,6 +108,11 @@ class LineChart: UIControl {
         self.drawingHeight = self.bounds.height - (2 * axisInset)
         self.drawingWidth = self.bounds.width - (2 * axisInset)
         
+        // remove all labels
+        for view: AnyObject in self.subviews {
+            view.removeFromSuperview()
+        }
+        
         // remove all lines on device rotation
         for lineLayer in lineLayerStore {
             lineLayer.removeFromSuperlayer()

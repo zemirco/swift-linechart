@@ -32,8 +32,12 @@ class LineChart: UIControl {
     var gridVisible = true
     var axesVisible = true
     var dotsVisible = true
+    var labelsXVisible = false
+    var labelsYVisible = false
     var numberOfGridLinesX: CGFloat = 10
     var numberOfGridLinesY: CGFloat = 10
+    var animationEnabled = true
+    var animationDuration: CFTimeInterval = 1
     
     var dotsBackgroundColor = UIColor.whiteColor()
     
@@ -66,24 +70,15 @@ class LineChart: UIControl {
     // data stores
     var dataStore: Array<Array<CGFloat>> = []
     var dotsDataStore: Array<Array<DotCALayer>> = []
+    var lineLayerStore: Array<CAShapeLayer> = []
     var colors: Array<UIColor> = []
     
     
     
     init(frame: CGRect) {
         super.init(frame: frame)
+        
         self.backgroundColor = UIColor.clearColor()
-    }
-    
-    
-    
-    convenience init() {
-        self.init(frame: CGRectZero)
-    }
-    
-    
-    
-    override func drawRect(rect: CGRect) {
         
         // category10 colors from d3 - https://github.com/mbostock/d3/wiki/Ordinal-Scales
         self.colors = [
@@ -98,25 +93,44 @@ class LineChart: UIControl {
             UIColorFromHex(0xbcbd22),
             UIColorFromHex(0x17becf)
         ]
+    }
+    
+    
+    
+    convenience init() {
+        self.init(frame: CGRectZero)
+    }
+    
+    
+    
+    override func drawRect(rect: CGRect) {
         
         self.drawingHeight = self.bounds.height - (2 * axisInset)
         self.drawingWidth = self.bounds.width - (2 * axisInset)
         
-        // remove all dots on device rotation
-        if dotsDataStore.count > 0 {
-            for dotsData in dotsDataStore {
-                for dot in dotsData {
-                    dot.removeFromSuperlayer()
-                }
-            }
-            dotsDataStore.removeAll()
+        // remove all lines on device rotation
+        for lineLayer in lineLayerStore {
+            lineLayer.removeFromSuperlayer()
         }
+        lineLayerStore.removeAll()
+        
+        // remove all dots on device rotation
+        for dotsData in dotsDataStore {
+            for dot in dotsData {
+                dot.removeFromSuperlayer()
+            }
+        }
+        dotsDataStore.removeAll()
         
         // draw grid
         if gridVisible { drawGrid() }
         
         // draw axes
         if axesVisible { drawAxes() }
+        
+        // draw labels
+        if labelsXVisible { drawXLabels() }
+        if labelsYVisible { drawYLabels() }
         
         // draw filled area between charts
         if areaBetweenLines[0] > -1 && areaBetweenLines[1] > -1 {
@@ -269,6 +283,16 @@ class LineChart: UIControl {
             dotLayer.frame = CGRect(x: xValue, y: yValue, width: dotsSize, height: dotsSize)
             self.layer.addSublayer(dotLayer)
             dots.append(dotLayer)
+            
+            // animate opacity
+            if animationEnabled {
+                var animation = CABasicAnimation(keyPath: "opacity")
+                animation.duration = animationDuration
+                animation.fromValue = 0
+                animation.toValue = 1
+                dotLayer.addAnimation(animation, forKey: "opacity")
+            }
+            
         }
         dotsDataStore.append(dots)
     }
@@ -345,16 +369,33 @@ class LineChart: UIControl {
      * Draw line.
      */
     func drawLine(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, lineIndex: Int) {
-        var context = UIGraphicsGetCurrentContext()
-        CGContextSetLineWidth(context, lineWidth)
-        CGContextSetStrokeColorWithColor(context, colors[lineIndex].CGColor)
-        CGContextMoveToPoint(context, axisInset, self.bounds.height - yAxis[0] - axisInset)
+        var path = CGPathCreateMutable()
+        CGPathMoveToPoint(path, nil, axisInset, self.bounds.height - yAxis[0] - axisInset)
         for index in 1..xAxis.count {
             var xValue = xAxis[index] + axisInset
             var yValue = self.bounds.height - yAxis[index] - axisInset
-            CGContextAddLineToPoint(context, xValue, yValue)
+            CGPathAddLineToPoint(path, nil, xValue, yValue)
         }
-        CGContextStrokePath(context)
+        
+        var layer = CAShapeLayer()
+        layer.frame = self.bounds
+        layer.path = path
+        layer.strokeColor = colors[lineIndex].CGColor
+        layer.fillColor = nil
+        layer.lineWidth = lineWidth
+        self.layer.addSublayer(layer)
+        
+        // animate line drawing
+        if animationEnabled {
+            var animation = CABasicAnimation(keyPath: "strokeEnd")
+            animation.duration = animationDuration
+            animation.fromValue = 0
+            animation.toValue = 1
+            layer.addAnimation(animation, forKey: "strokeEnd")
+        }
+        
+        // add line layer to store
+        lineLayerStore.append(layer)
     }
     
     
@@ -421,11 +462,13 @@ class LineChart: UIControl {
      * Draw y grid.
      */
     func drawYGrid() {
-        var space = drawingHeight / numberOfGridLinesY
+        var maximumYValue = getMaximumValue()
+        var step = Int(maximumYValue) / Int(numberOfGridLinesY)
+        var height = drawingHeight / maximumYValue
         var context = UIGraphicsGetCurrentContext()
-        for index in 1...numberOfGridLinesY {
-            CGContextMoveToPoint(context, axisInset, self.bounds.height - (index * space) - axisInset)
-            CGContextAddLineToPoint(context, self.bounds.width - axisInset, self.bounds.height - (index * space) - axisInset)
+        for var index = 0; index <= Int(maximumYValue); index += step {
+            CGContextMoveToPoint(context, axisInset, self.bounds.height - (CGFloat(index) * height) - axisInset)
+            CGContextAddLineToPoint(context, self.bounds.width - axisInset, self.bounds.height - (CGFloat(index) * height) - axisInset)
         }
         CGContextStrokePath(context)
     }
@@ -438,6 +481,42 @@ class LineChart: UIControl {
     func drawGrid() {
         drawXGrid()
         drawYGrid()
+    }
+    
+    
+    
+    /**
+     * Draw x labels.
+     */
+    func drawXLabels() {
+        var xAxisData = self.dataStore[0]
+        var scaledDataXAxis = scaleDataXAxis(xAxisData)
+        for (index, scaledValue) in enumerate(scaledDataXAxis) {
+            var label = UILabel(frame: CGRect(x: scaledValue + (axisInset/2), y: self.bounds.height-axisInset, width: axisInset, height: axisInset))
+            label.font = UIFont.systemFontOfSize(10)
+            label.textAlignment = NSTextAlignment.Center
+            label.text = String(index)
+            self.addSubview(label)
+        }
+    }
+    
+    
+    
+    /**
+     * Draw y labels.
+     */
+    func drawYLabels() {
+        var maximumYValue = getMaximumValue()
+        var step = Int(maximumYValue) / Int(numberOfGridLinesY)
+        var height = drawingHeight / maximumYValue
+        for var index = 0; index <= Int(maximumYValue); index += step {
+            var yValue = self.bounds.height - (CGFloat(index) * height) - (axisInset * 1.5)
+            var label = UILabel(frame: CGRect(x: 0, y: yValue, width: axisInset, height: axisInset))
+            label.font = UIFont.systemFontOfSize(10)
+            label.textAlignment = NSTextAlignment.Center
+            label.text = String(index)
+            self.addSubview(label)
+        }
     }
     
     

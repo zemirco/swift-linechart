@@ -85,7 +85,7 @@ var lineChart = LineChart()
 lineChart.dotsVisible = false
 lineChart.addLine([3, 4, 9, 11, 13, 15])
 lineChart.addLine([5, 4, 3, 6, 6, 7])
-lineChart!.areaBetweenLines = [0, 1]
+lineChart.areaBetweenLines = [0, 1]
 ```
 
 ## License

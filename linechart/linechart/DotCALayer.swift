@@ -4,9 +4,9 @@ import QuartzCore
 
 class DotCALayer: CALayer {
     
-    var dotBorderWith: CGFloat = 4
+    var innerRadius: CGFloat = 8
     var dotInnerColor = UIColor.blackColor()
-   
+    
     init() {
         super.init()
     }
@@ -17,16 +17,11 @@ class DotCALayer: CALayer {
     
     override func layoutSublayers() {
         super.layoutSublayers()
-        
-        // add inner dot
-        var outerDotLayerWidth = self.bounds.size.width
-        var innerDotLayerWidth = outerDotLayerWidth - dotBorderWith
-    
+        var inset = self.bounds.size.width - innerRadius
         var innerDotLayer = CALayer()
+        innerDotLayer.frame = CGRectInset(self.bounds, inset/2, inset/2)
         innerDotLayer.backgroundColor = dotInnerColor.CGColor
-        innerDotLayer.cornerRadius = innerDotLayerWidth / 2
-        innerDotLayer.frame = CGRect(x: dotBorderWith/2, y: dotBorderWith/2, width: innerDotLayerWidth, height: innerDotLayerWidth)
-        
+        innerDotLayer.cornerRadius = innerRadius / 2
         self.addSublayer(innerDotLayer)
     }
     

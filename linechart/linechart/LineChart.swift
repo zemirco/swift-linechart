@@ -471,6 +471,7 @@ class LineChart: UIControl {
     func drawYGrid() {
         var maximumYValue = getMaximumValue()
         var step = Int(maximumYValue) / Int(numberOfGridLinesY)
+        step = step == 0 ? 1 : step
         var height = drawingHeight / maximumYValue
         var context = UIGraphicsGetCurrentContext()
         for var index = 0; index <= Int(maximumYValue); index += step {
@@ -515,6 +516,7 @@ class LineChart: UIControl {
     func drawYLabels() {
         var maximumYValue = getMaximumValue()
         var step = Int(maximumYValue) / Int(numberOfGridLinesY)
+        step = step == 0 ? 1 : step
         var height = drawingHeight / maximumYValue
         for var index = 0; index <= Int(maximumYValue); index += step {
             var yValue = self.bounds.height - (CGFloat(index) * height) - (axisInset * 1.5)

@@ -25,12 +25,15 @@ class MainViewController: UIViewController, LineChartDelegate {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-80-[label]", options: nil, metrics: nil, views: views))
         
         var data: Array<CGFloat> = [3, 4, 9, 11, 13, 15]
+        var data2: Array<CGFloat> = [1, 3, 5, 13, 17, 20]
         
         lineChart = LineChart()
+        lineChart!.areaUnderLinesVisible = true
         lineChart!.addLine(data)
+        lineChart!.addLine(data2)
         lineChart!.setTranslatesAutoresizingMaskIntoConstraints(false)
         lineChart!.delegate = self
-        self.view.addSubview(lineChart)
+        self.view.addSubview(lineChart!)
         views["chart"] = lineChart
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[chart]-|", options: nil, metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:[label]-[chart(==200)]", options: nil, metrics: nil, views: views))

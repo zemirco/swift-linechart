@@ -7,9 +7,9 @@ import QuartzCore
 
 
 // make Arrays substractable
-@infix func - (left: Array<CGFloat>, right: Array<CGFloat>) -> Array<CGFloat> {
+func - (left: Array<CGFloat>, right: Array<CGFloat>) -> Array<CGFloat> {
     var result: Array<CGFloat> = []
-    for index in 0..left.count {
+    for index in 0..<left.count {
         var difference = left[index] - right[index]
         result.append(difference)
     }
@@ -34,6 +34,7 @@ class LineChart: UIControl {
     var dotsVisible = true
     var labelsXVisible = false
     var labelsYVisible = false
+    var areaUnderLinesVisible = false
     var numberOfGridLinesX: CGFloat = 10
     var numberOfGridLinesY: CGFloat = 10
     var animationEnabled = true
@@ -77,7 +78,7 @@ class LineChart: UIControl {
     
     
     
-    init(frame: CGRect) {
+    override init(frame: CGRect) {
         super.init(frame: frame)
         
         self.backgroundColor = UIColor.clearColor()
@@ -99,10 +100,13 @@ class LineChart: UIControl {
     
     
     
-    convenience init() {
+    convenience override init() {
         self.init(frame: CGRectZero)
     }
     
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
     
     
     override func drawRect(rect: CGRect) {
@@ -152,6 +156,10 @@ class LineChart: UIControl {
             
             // draw dots
             if dotsVisible { drawDataDots(scaledDataXAxis, yAxis: scaledDataYAxis, lineIndex: lineIndex) }
+            
+            // draw area under line chart
+            if areaUnderLinesVisible { drawAreaBeneathLineChart(scaledDataXAxis, yAxis: scaledDataYAxis, lineIndex: lineIndex) }
+            
         }
         
     }
@@ -277,7 +285,7 @@ class LineChart: UIControl {
     */
     func drawDataDots(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, lineIndex: Int) {
         var dots: Array<DotCALayer> = []
-        for index in 0..xAxis.count {
+        for index in 0..<xAxis.count {
             var xValue = xAxis[index] + axisInset - outerRadius/2
             var yValue = self.bounds.height - yAxis[index] - axisInset - outerRadius/2
             
@@ -348,7 +356,7 @@ class LineChart: UIControl {
     func scaleDataXAxis(data: Array<CGFloat>) -> Array<CGFloat> {
         var factor = drawingWidth / CGFloat(data.count - 1)
         var scaledDataXAxis: Array<CGFloat> = []
-        for index in 0..data.count {
+        for index in 0..<data.count {
             var newXValue = factor * CGFloat(index)
             scaledDataXAxis.append(newXValue)
         }
@@ -378,7 +386,7 @@ class LineChart: UIControl {
     func drawLine(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, lineIndex: Int) {
         var path = CGPathCreateMutable()
         CGPathMoveToPoint(path, nil, axisInset, self.bounds.height - yAxis[0] - axisInset)
-        for index in 1..xAxis.count {
+        for index in 1..<xAxis.count {
             var xValue = xAxis[index] + axisInset
             var yValue = self.bounds.height - yAxis[index] - axisInset
             CGPathAddLineToPoint(path, nil, xValue, yValue)
@@ -406,6 +414,30 @@ class LineChart: UIControl {
     }
     
     
+    /**
+     * Fill area between line chart and x-axis.
+     */
+    func drawAreaBeneathLineChart(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, lineIndex: Int) {
+        var context = UIGraphicsGetCurrentContext()
+        CGContextSetFillColorWithColor(context, colors[lineIndex].colorWithAlphaComponent(0.2).CGColor)
+        // move to origin
+        CGContextMoveToPoint(context, axisInset, self.bounds.height - axisInset)
+        // add line to first data point
+        CGContextAddLineToPoint(context, axisInset, self.bounds.height - yAxis[0] - axisInset)
+        // draw whole line chart
+        for index in 1..<xAxis.count {
+            var xValue = xAxis[index] + axisInset
+            var yValue = self.bounds.height - yAxis[index] - axisInset
+            CGContextAddLineToPoint(context, xValue, yValue)
+        }
+        // move down to x axis
+        CGContextAddLineToPoint(context, xAxis[xAxis.count-1] + axisInset, self.bounds.height - axisInset)
+        // move to origin
+        CGContextAddLineToPoint(context, axisInset, self.bounds.height - axisInset)
+        CGContextFillPath(context)
+    }
+    
+    
     
     /**
     * Fill area between charts.
@@ -417,7 +449,7 @@ class LineChart: UIControl {
         var yAxisDataB = scaleDataYAxis(dataStore[areaBetweenLines[1]])
         var difference = yAxisDataA - yAxisDataB
         
-        for index in 0..xAxis.count-1 {
+        for index in 0..<xAxis.count-1 {
             
             var context = UIGraphicsGetCurrentContext()
             
@@ -456,9 +488,9 @@ class LineChart: UIControl {
         var space = drawingWidth / numberOfGridLinesX
         var context = UIGraphicsGetCurrentContext()
         CGContextSetStrokeColorWithColor(context, gridColor.CGColor)
-        for index in 1...numberOfGridLinesX {
-            CGContextMoveToPoint(context, axisInset + (index * space), self.bounds.height - axisInset)
-            CGContextAddLineToPoint(context, axisInset + (index * space), axisInset)
+        for index in 1...Int(numberOfGridLinesX) {
+            CGContextMoveToPoint(context, axisInset + (CGFloat(index) * space), self.bounds.height - axisInset)
+            CGContextAddLineToPoint(context, axisInset + (CGFloat(index) * space), axisInset)
         }
         CGContextStrokePath(context)
     }

@@ -7,12 +7,16 @@ class DotCALayer: CALayer {
     var innerRadius: CGFloat = 8
     var dotInnerColor = UIColor.blackColor()
     
-    init() {
+    override init() {
         super.init()
     }
-    
-    init(layer: AnyObject!) {
+
+    override init(layer: AnyObject!) {
         super.init(layer: layer)
+    }
+    
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
     }
     
     override func layoutSublayers() {

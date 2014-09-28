@@ -228,7 +228,7 @@ class LineChart: UIControl {
     /**
     * Listen on touch end event.
     */
-    override func touchesEnded(touches: NSSet!, withEvent event: UIEvent!) {
+    override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
         handleTouchEvents(touches, event: event)
     }
     
@@ -237,7 +237,7 @@ class LineChart: UIControl {
     /**
     * Listen on touch move event
     */
-    override func touchesMoved(touches: NSSet!, withEvent event: UIEvent!) {
+    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
         handleTouchEvents(touches, event: event)
     }
     

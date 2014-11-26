@@ -38,6 +38,14 @@ class MainViewController: UIViewController, LineChartDelegate {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[chart]-|", options: nil, metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:[label]-[chart(==200)]", options: nil, metrics: nil, views: views))
         
+        var delta: Int64 = 4 * Int64(NSEC_PER_SEC)
+        var time = dispatch_time(DISPATCH_TIME_NOW, delta)
+        
+        dispatch_after(time, dispatch_get_main_queue(), {
+            self.lineChart!.clear()
+            self.lineChart!.addLine(data2)
+        });
+        
     }
     
     

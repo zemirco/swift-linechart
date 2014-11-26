@@ -76,6 +76,7 @@ class LineChart: UIControl {
     var lineLayerStore: Array<CAShapeLayer> = []
     var colors: Array<UIColor> = []
     
+    var removeAll: Bool = false
     
     
     override init(frame: CGRect) {
@@ -110,6 +111,12 @@ class LineChart: UIControl {
     
     
     override func drawRect(rect: CGRect) {
+        
+        if removeAll {
+            var context = UIGraphicsGetCurrentContext()
+            CGContextClearRect(context, rect)
+            return
+        }
         
         self.drawingHeight = self.bounds.height - (2 * axisInset)
         self.drawingWidth = self.bounds.width - (2 * axisInset)
@@ -215,6 +222,7 @@ class LineChart: UIControl {
     * Handle touch events.
     */
     func handleTouchEvents(touches: NSSet!, event: UIEvent!) {
+        if (self.dataStore.isEmpty) { return }
         var point: AnyObject! = touches.anyObject()
         var xValue = point.locationInView(self).x
         var closestXValueIndex = findClosestXValueInData(xValue)
@@ -338,7 +346,7 @@ class LineChart: UIControl {
     * Get maximum value in all arrays in data store.
     */
     func getMaximumValue() -> CGFloat {
-        var maximum = 0
+        var maximum = 1
         for data in dataStore {
             var newMaximum = data.reduce(Int.min, { max(Int($0), Int($1)) })
             if newMaximum > maximum {
@@ -570,4 +578,25 @@ class LineChart: UIControl {
         self.setNeedsDisplay()
     }
     
+    
+    /**
+     * Make whole thing white again.
+     */
+    func clearAll() {
+        self.removeAll = true
+        clear()
+        self.setNeedsDisplay()
+        self.removeAll = false
+    }
+    
+    
+    
+    /**
+     * Remove charts, areas and labels but keep axis and grid.
+     */
+    func clear() {
+        // clear data
+        dataStore.removeAll()
+        self.setNeedsDisplay()
+    }
 }

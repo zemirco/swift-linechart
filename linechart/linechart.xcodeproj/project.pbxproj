@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3BF360CB1AA4F21E00928F0A /* LinearScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF360CA1AA4F21E00928F0A /* LinearScale.swift */; };
 		C06F8E1B1962FFD7000AC9AF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06F8E1A1962FFD7000AC9AF /* AppDelegate.swift */; };
 		C06F8E1D1962FFD7000AC9AF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C06F8E1C1962FFD7000AC9AF /* Images.xcassets */; };
 		C06F8E291962FFD7000AC9AF /* linechartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06F8E281962FFD7000AC9AF /* linechartTests.swift */; };
@@ -26,6 +27,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3BF360CA1AA4F21E00928F0A /* LinearScale.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearScale.swift; sourceTree = "<group>"; };
 		C06F8E151962FFD7000AC9AF /* linechart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = linechart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C06F8E191962FFD7000AC9AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C06F8E1A1962FFD7000AC9AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 			children = (
 				C06F8E321962FFEC000AC9AF /* MainViewController.swift */,
 				C06F8E3419630045000AC9AF /* LineChart.swift */,
+				3BF360CA1AA4F21E00928F0A /* LinearScale.swift */,
 				C09A3A75196405FA00D3F98D /* DotCALayer.swift */,
 				C06F8E181962FFD7000AC9AF /* Supporting Files */,
 			);
@@ -212,6 +215,7 @@
 				C06F8E1B1962FFD7000AC9AF /* AppDelegate.swift in Sources */,
 				C06F8E331962FFEC000AC9AF /* MainViewController.swift in Sources */,
 				C06F8E3519630045000AC9AF /* LineChart.swift in Sources */,
+				3BF360CB1AA4F21E00928F0A /* LinearScale.swift in Sources */,
 				C09A3A76196405FA00D3F98D /* DotCALayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

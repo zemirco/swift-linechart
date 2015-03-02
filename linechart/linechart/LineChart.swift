@@ -174,6 +174,24 @@ class LineChart: UIView {
     
     
     /**
+     * Return maximum value from array
+     */
+    func getMax(data: [CGFloat]) -> CGFloat {
+        return maxElement(data)
+    }
+    
+    
+    
+    /**
+     * Return minimum value from array
+     */
+    func getMin(data: [CGFloat]) -> CGFloat {
+        return minElement(data)
+    }
+    
+    
+    
+    /**
      * Convert hex color to UIColor
      */
     func UIColorFromHex(hex: Int) -> UIColor {
@@ -221,7 +239,7 @@ class LineChart: UIView {
     /**
      * Handle touch events.
      */
-    func handleTouchEvents(touches: NSSet!, event: UIEvent!) {
+    func handleTouchEvents(touches: NSSet!, event: UIEvent) {
         if (self.dataStore.isEmpty) { return }
         var point: AnyObject! = touches.anyObject()
         var xValue = point.locationInView(self).x
@@ -328,16 +346,16 @@ class LineChart: UIView {
     func drawAxes() {
         var height = self.bounds.height
         var width = self.bounds.width
-        var context = UIGraphicsGetCurrentContext()
-        CGContextSetStrokeColorWithColor(context, axesColor.CGColor)
+        var path = UIBezierPath()
+        axesColor.setStroke()
         // draw x-axis
-        CGContextMoveToPoint(context, axisInset, height-axisInset)
-        CGContextAddLineToPoint(context, width-axisInset, height-axisInset)
-        CGContextStrokePath(context)
+        path.moveToPoint(CGPoint(x: axisInset, y: height-axisInset))
+        path.addLineToPoint(CGPoint(x: width-axisInset, y: height-axisInset))
+        path.stroke()
         // draw y-axis
-        CGContextMoveToPoint(context, axisInset, height-axisInset)
-        CGContextAddLineToPoint(context, axisInset, axisInset)
-        CGContextStrokePath(context)
+        path.moveToPoint(CGPoint(x: axisInset, y: height-axisInset))
+        path.addLineToPoint(CGPoint(x: axisInset, y: axisInset))
+        path.stroke()
     }
     
     
@@ -346,14 +364,14 @@ class LineChart: UIView {
      * Get maximum value in all arrays in data store.
      */
     func getMaximumValue() -> CGFloat {
-        var maximum = 1
+        var max: CGFloat = 1
         for data in dataStore {
-            var newMaximum = data.reduce(Int.min, combine: { max(Int($0), Int($1)) })
-            if newMaximum > maximum {
-                maximum = newMaximum
+            var newMax = self.getMax(data)
+            if newMax > max {
+                max = newMax
             }
         }
-        return CGFloat(maximum)
+        return max
     }
     
     
@@ -392,17 +410,18 @@ class LineChart: UIView {
      * Draw line.
      */
     func drawLine(xAxis: [CGFloat], yAxis: [CGFloat], lineIndex: Int) {
-        var path = CGPathCreateMutable()
-        CGPathMoveToPoint(path, nil, axisInset, self.bounds.height - yAxis[0] - axisInset)
+        
+        var path = UIBezierPath()
+        path.moveToPoint(CGPoint(x: axisInset, y:  self.bounds.height - yAxis[0] - axisInset))
         for index in 1..<xAxis.count {
-            var xValue = xAxis[index] + axisInset
-            var yValue = self.bounds.height - yAxis[index] - axisInset
-            CGPathAddLineToPoint(path, nil, xValue, yValue)
+            var x = xAxis[index] + axisInset
+            var y = self.bounds.height - yAxis[index] - axisInset
+            path.addLineToPoint(CGPoint(x: x, y: y))
         }
         
         var layer = CAShapeLayer()
         layer.frame = self.bounds
-        layer.path = path
+        layer.path = path.CGPath
         layer.strokeColor = colors[lineIndex].CGColor
         layer.fillColor = nil
         layer.lineWidth = lineWidth

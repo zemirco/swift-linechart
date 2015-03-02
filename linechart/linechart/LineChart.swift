@@ -174,8 +174,8 @@ class LineChart: UIView {
     
     
     /**
-    * Convert hex color to UIColor
-    */
+     * Convert hex color to UIColor
+     */
     func UIColorFromHex(hex: Int) -> UIColor {
         var red = CGFloat((hex & 0xFF0000) >> 16) / 255.0
         var green = CGFloat((hex & 0xFF00) >> 8) / 255.0
@@ -186,8 +186,8 @@ class LineChart: UIView {
     
     
     /**
-    * Lighten color.
-    */
+     * Lighten color.
+     */
     func lightenUIColor(color: UIColor) -> UIColor {
         var h: CGFloat = 0
         var s: CGFloat = 0
@@ -200,8 +200,8 @@ class LineChart: UIView {
     
     
     /**
-    * Get y value for given x value. Or return zero or maximum value.
-    */
+     * Get y value for given x value. Or return zero or maximum value.
+     */
     func getYValuesForXValue(x: Int) -> [CGFloat] {
         var result: [CGFloat] = []
         for lineData in dataStore {
@@ -219,8 +219,8 @@ class LineChart: UIView {
     
     
     /**
-    * Handle touch events.
-    */
+     * Handle touch events.
+     */
     func handleTouchEvents(touches: NSSet!, event: UIEvent!) {
         if (self.dataStore.isEmpty) { return }
         var point: AnyObject! = touches.anyObject()
@@ -234,8 +234,8 @@ class LineChart: UIView {
     
     
     /**
-    * Listen on touch end event.
-    */
+     * Listen on touch end event.
+     */
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
         handleTouchEvents(touches, event: event)
     }
@@ -243,8 +243,8 @@ class LineChart: UIView {
     
     
     /**
-    * Listen on touch move event
-    */
+     * Listen on touch move event
+     */
     override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent) {
         handleTouchEvents(touches, event: event)
     }
@@ -252,8 +252,8 @@ class LineChart: UIView {
     
     
     /**
-    * Find closest value on x axis.
-    */
+     * Find closest value on x axis.
+     */
     func findClosestXValueInData(xValue: CGFloat) -> Int {
         var scaledDataXAxis = scaleDataXAxis(dataStore[0])
         var difference = scaledDataXAxis[1] - scaledDataXAxis[0]
@@ -265,8 +265,8 @@ class LineChart: UIView {
     
     
     /**
-    * Highlight data points at index.
-    */
+     * Highlight data points at index.
+     */
     func highlightDataPoints(index: Int) {
         for (lineIndex, dotsData) in enumerate(dotsDataStore) {
             // make all dots white again
@@ -289,8 +289,8 @@ class LineChart: UIView {
     
     
     /**
-    * Draw small dot at every data point.
-    */
+     * Draw small dot at every data point.
+     */
     func drawDataDots(xAxis: [CGFloat], yAxis: [CGFloat], lineIndex: Int) {
         var dots: [DotCALayer] = []
         for index in 0..<xAxis.count {
@@ -323,8 +323,8 @@ class LineChart: UIView {
     
     
     /**
-    * Draw x and y axis.
-    */
+     * Draw x and y axis.
+     */
     func drawAxes() {
         var height = self.bounds.height
         var width = self.bounds.width
@@ -343,8 +343,8 @@ class LineChart: UIView {
     
     
     /**
-    * Get maximum value in all arrays in data store.
-    */
+     * Get maximum value in all arrays in data store.
+     */
     func getMaximumValue() -> CGFloat {
         var maximum = 1
         for data in dataStore {
@@ -359,8 +359,8 @@ class LineChart: UIView {
     
     
     /**
-    * Scale to fit drawing width.
-    */
+     * Scale to fit drawing width.
+     */
     func scaleDataXAxis(data: [CGFloat]) -> [CGFloat] {
         var factor = drawingWidth / CGFloat(data.count - 1)
         var scaledDataXAxis: Array<CGFloat> = []
@@ -374,8 +374,8 @@ class LineChart: UIView {
     
     
     /**
-    * Scale data to fit drawing height.
-    */
+     * Scale data to fit drawing height.
+     */
     func scaleDataYAxis(data: [CGFloat]) -> [CGFloat] {
         var maximumYValue = getMaximumValue()
         var factor = drawingHeight / maximumYValue
@@ -389,8 +389,8 @@ class LineChart: UIView {
     
     
     /**
-    * Draw line.
-    */
+     * Draw line.
+     */
     func drawLine(xAxis: [CGFloat], yAxis: [CGFloat], lineIndex: Int) {
         var path = CGPathCreateMutable()
         CGPathMoveToPoint(path, nil, axisInset, self.bounds.height - yAxis[0] - axisInset)
@@ -448,8 +448,8 @@ class LineChart: UIView {
     
     
     /**
-    * Fill area between charts.
-    */
+     * Fill area between charts.
+     */
     func drawAreaBetweenLineCharts() {
         
         var xAxis = scaleDataXAxis(dataStore[0])
@@ -490,8 +490,8 @@ class LineChart: UIView {
     
     
     /**
-    * Draw x grid.
-    */
+     * Draw x grid.
+     */
     func drawXGrid() {
         var space = drawingWidth / numberOfGridLinesX
         gridColor.setStroke()
@@ -512,26 +512,33 @@ class LineChart: UIView {
     
     
     /**
-    * Draw y grid.
-    */
+     * Draw y grid.
+     */
     func drawYGrid() {
         var maximumYValue = getMaximumValue()
         var step = Int(maximumYValue) / Int(numberOfGridLinesY)
         step = step == 0 ? 1 : step
         var height = drawingHeight / maximumYValue
-        var context = UIGraphicsGetCurrentContext()
+        gridColor.setStroke()
+        var path = UIBezierPath();
+        var x1: CGFloat
+        var x2: CGFloat
+        var y: CGFloat
         for var index = 0; index <= Int(maximumYValue); index += step {
-            CGContextMoveToPoint(context, axisInset, self.bounds.height - (CGFloat(index) * height) - axisInset)
-            CGContextAddLineToPoint(context, self.bounds.width - axisInset, self.bounds.height - (CGFloat(index) * height) - axisInset)
+            x1 = axisInset
+            x2 = self.bounds.width - axisInset
+            y = self.bounds.height - (CGFloat(index) * height) - axisInset
+            path.moveToPoint(CGPoint(x: x1, y: y))
+            path.addLineToPoint(CGPoint(x: x2, y: y))
         }
-        CGContextStrokePath(context)
+        path.stroke()
     }
     
     
     
     /**
-    * Draw grid.
-    */
+     * Draw grid.
+     */
     func drawGrid() {
         drawXGrid()
         drawYGrid()
@@ -540,8 +547,8 @@ class LineChart: UIView {
     
     
     /**
-    * Draw x labels.
-    */
+     * Draw x labels.
+     */
     func drawXLabels() {
         var xAxisData = self.dataStore[0]
         var scaledDataXAxis = scaleDataXAxis(xAxisData)
@@ -557,8 +564,8 @@ class LineChart: UIView {
     
     
     /**
-    * Draw y labels.
-    */
+     * Draw y labels.
+     */
     func drawYLabels() {
         var maximumYValue = getMaximumValue()
         var step = Int(maximumYValue) / Int(numberOfGridLinesY)
@@ -577,8 +584,8 @@ class LineChart: UIView {
     
     
     /**
-    * Add line chart
-    */
+     * Add line chart
+     */
     func addLine(data: [CGFloat]) {
         self.dataStore.append(data)
         self.setNeedsDisplay()

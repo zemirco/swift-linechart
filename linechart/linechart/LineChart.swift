@@ -19,7 +19,7 @@ func - (left: [CGFloat], right: [CGFloat]) -> [CGFloat] {
 
 
 // delegate method
-@objc protocol LineChartDelegate {
+protocol LineChartDelegate {
     func didSelectDataPoint(x: CGFloat, yValues: [CGFloat])
 }
 
@@ -202,7 +202,7 @@ class LineChart: UIView {
     /**
     * Get y value for given x value. Or return zero or maximum value.
     */
-    func getYValuesForXValue(x: Int) -> Array<CGFloat> {
+    func getYValuesForXValue(x: Int) -> [CGFloat] {
         var result: [CGFloat] = []
         for lineData in dataStore {
             if x < 0 {
@@ -226,7 +226,7 @@ class LineChart: UIView {
         var point: AnyObject! = touches.anyObject()
         var xValue = point.locationInView(self).x
         var closestXValueIndex = findClosestXValueInData(xValue)
-        var yValues: Array<CGFloat> = getYValuesForXValue(closestXValueIndex)
+        var yValues: [CGFloat] = getYValuesForXValue(closestXValueIndex)
         highlightDataPoints(closestXValueIndex)
         delegate?.didSelectDataPoint(CGFloat(closestXValueIndex), yValues: yValues)
     }
@@ -494,13 +494,19 @@ class LineChart: UIView {
     */
     func drawXGrid() {
         var space = drawingWidth / numberOfGridLinesX
-        var context = UIGraphicsGetCurrentContext()
-        CGContextSetStrokeColorWithColor(context, gridColor.CGColor)
+        gridColor.setStroke()
+        var path = UIBezierPath();
+        var x: CGFloat
+        var y1: CGFloat
+        var y2: CGFloat
         for index in 1...Int(numberOfGridLinesX) {
-            CGContextMoveToPoint(context, axisInset + (CGFloat(index) * space), self.bounds.height - axisInset)
-            CGContextAddLineToPoint(context, axisInset + (CGFloat(index) * space), axisInset)
+            x = axisInset + (CGFloat(index) * space)
+            y1 = self.bounds.height - axisInset
+            y2 = axisInset
+            path.moveToPoint(CGPoint(x: x, y: y1))
+            path.addLineToPoint(CGPoint(x: x, y: y2))
         }
-        CGContextStrokePath(context)
+        path.stroke()
     }
     
     

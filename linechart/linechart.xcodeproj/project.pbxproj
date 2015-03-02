@@ -77,11 +77,9 @@
 		C06F8E171962FFD7000AC9AF /* linechart */ = {
 			isa = PBXGroup;
 			children = (
-				C06F8E1A1962FFD7000AC9AF /* AppDelegate.swift */,
 				C06F8E321962FFEC000AC9AF /* MainViewController.swift */,
 				C06F8E3419630045000AC9AF /* LineChart.swift */,
 				C09A3A75196405FA00D3F98D /* DotCALayer.swift */,
-				C06F8E1C1962FFD7000AC9AF /* Images.xcassets */,
 				C06F8E181962FFD7000AC9AF /* Supporting Files */,
 			);
 			path = linechart;
@@ -90,6 +88,8 @@
 		C06F8E181962FFD7000AC9AF /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C06F8E1A1962FFD7000AC9AF /* AppDelegate.swift */,
+				C06F8E1C1962FFD7000AC9AF /* Images.xcassets */,
 				C06F8E191962FFD7000AC9AF /* Info.plist */,
 			);
 			name = "Supporting Files";

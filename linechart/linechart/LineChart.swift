@@ -26,7 +26,7 @@ func - (left: [CGFloat], right: [CGFloat]) -> [CGFloat] {
 
 
 // LineChart class
-class LineChart: UIControl {
+class LineChart: UIView {
     
     // default configuration
     var gridVisible = true

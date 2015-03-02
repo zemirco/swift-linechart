@@ -14,7 +14,7 @@ class MainViewController: UIViewController, LineChartDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        var views: Dictionary<String, AnyObject> = [:]
+        var views: [String: AnyObject] = [:]
         
         label.text = "..."
         label.setTranslatesAutoresizingMaskIntoConstraints(false)
@@ -24,8 +24,8 @@ class MainViewController: UIViewController, LineChartDelegate {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[label]-|", options: nil, metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-80-[label]", options: nil, metrics: nil, views: views))
         
-        var data: Array<CGFloat> = [3, 4, 9, 11, 13, 15]
-        var data2: Array<CGFloat> = [1, 3, 5, 13, 17, 20]
+        var data: [CGFloat] = [3, 4, 9, 11, 13, 15]
+        var data2: [CGFloat] = [1, 3, 5, 13, 17, 20]
         
         lineChart = LineChart()
         lineChart!.areaUnderLinesVisible = true
@@ -38,13 +38,13 @@ class MainViewController: UIViewController, LineChartDelegate {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[chart]-|", options: nil, metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:[label]-[chart(==200)]", options: nil, metrics: nil, views: views))
         
-        var delta: Int64 = 4 * Int64(NSEC_PER_SEC)
-        var time = dispatch_time(DISPATCH_TIME_NOW, delta)
-        
-        dispatch_after(time, dispatch_get_main_queue(), {
-            self.lineChart!.clear()
-            self.lineChart!.addLine(data2)
-        });
+//        var delta: Int64 = 4 * Int64(NSEC_PER_SEC)
+//        var time = dispatch_time(DISPATCH_TIME_NOW, delta)
+//        
+//        dispatch_after(time, dispatch_get_main_queue(), {
+//            self.lineChart!.clear()
+//            self.lineChart!.addLine(data2)
+//        });
         
     }
     

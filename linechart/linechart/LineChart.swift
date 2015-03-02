@@ -7,8 +7,8 @@ import QuartzCore
 
 
 // make Arrays substractable
-func - (left: Array<CGFloat>, right: Array<CGFloat>) -> Array<CGFloat> {
-    var result: Array<CGFloat> = []
+func - (left: [CGFloat], right: [CGFloat]) -> [CGFloat] {
+    var result: [CGFloat] = []
     for index in 0..<left.count {
         var difference = left[index] - right[index]
         result.append(difference)
@@ -20,7 +20,7 @@ func - (left: Array<CGFloat>, right: Array<CGFloat>) -> Array<CGFloat> {
 
 // delegate method
 @objc protocol LineChartDelegate {
-    func didSelectDataPoint(x: CGFloat, yValues: Array<CGFloat>)
+    func didSelectDataPoint(x: CGFloat, yValues: [CGFloat])
 }
 
 
@@ -71,10 +71,10 @@ class LineChart: UIControl {
     var delegate: LineChartDelegate?
     
     // data stores
-    var dataStore: Array<Array<CGFloat>> = []
-    var dotsDataStore: Array<Array<DotCALayer>> = []
-    var lineLayerStore: Array<CAShapeLayer> = []
-    var colors: Array<UIColor> = []
+    var dataStore: [[CGFloat]] = []
+    var dotsDataStore: [[DotCALayer]] = []
+    var lineLayerStore: [CAShapeLayer] = []
+    var colors: [UIColor] = []
     
     var removeAll: Bool = false
     
@@ -203,7 +203,7 @@ class LineChart: UIControl {
     * Get y value for given x value. Or return zero or maximum value.
     */
     func getYValuesForXValue(x: Int) -> Array<CGFloat> {
-        var result: Array<CGFloat> = []
+        var result: [CGFloat] = []
         for lineData in dataStore {
             if x < 0 {
                 result.append(lineData[0])
@@ -291,8 +291,8 @@ class LineChart: UIControl {
     /**
     * Draw small dot at every data point.
     */
-    func drawDataDots(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, lineIndex: Int) {
-        var dots: Array<DotCALayer> = []
+    func drawDataDots(xAxis: [CGFloat], yAxis: [CGFloat], lineIndex: Int) {
+        var dots: [DotCALayer] = []
         for index in 0..<xAxis.count {
             var xValue = xAxis[index] + axisInset - outerRadius/2
             var yValue = self.bounds.height - yAxis[index] - axisInset - outerRadius/2
@@ -361,7 +361,7 @@ class LineChart: UIControl {
     /**
     * Scale to fit drawing width.
     */
-    func scaleDataXAxis(data: Array<CGFloat>) -> Array<CGFloat> {
+    func scaleDataXAxis(data: [CGFloat]) -> [CGFloat] {
         var factor = drawingWidth / CGFloat(data.count - 1)
         var scaledDataXAxis: Array<CGFloat> = []
         for index in 0..<data.count {
@@ -376,7 +376,7 @@ class LineChart: UIControl {
     /**
     * Scale data to fit drawing height.
     */
-    func scaleDataYAxis(data: Array<CGFloat>) -> Array<CGFloat> {
+    func scaleDataYAxis(data: [CGFloat]) -> [CGFloat] {
         var maximumYValue = getMaximumValue()
         var factor = drawingHeight / maximumYValue
         var scaledDataYAxis = data.map({datum -> CGFloat in
@@ -391,7 +391,7 @@ class LineChart: UIControl {
     /**
     * Draw line.
     */
-    func drawLine(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, lineIndex: Int) {
+    func drawLine(xAxis: [CGFloat], yAxis: [CGFloat], lineIndex: Int) {
         var path = CGPathCreateMutable()
         CGPathMoveToPoint(path, nil, axisInset, self.bounds.height - yAxis[0] - axisInset)
         for index in 1..<xAxis.count {
@@ -425,7 +425,7 @@ class LineChart: UIControl {
     /**
      * Fill area between line chart and x-axis.
      */
-    func drawAreaBeneathLineChart(xAxis: Array<CGFloat>, yAxis: Array<CGFloat>, lineIndex: Int) {
+    func drawAreaBeneathLineChart(xAxis: [CGFloat], yAxis: [CGFloat], lineIndex: Int) {
         var context = UIGraphicsGetCurrentContext()
         CGContextSetFillColorWithColor(context, colors[lineIndex].colorWithAlphaComponent(0.2).CGColor)
         // move to origin
@@ -573,7 +573,7 @@ class LineChart: UIControl {
     /**
     * Add line chart
     */
-    func addLine(data: Array<CGFloat>) {
+    func addLine(data: [CGFloat]) {
         self.dataStore.append(data)
         self.setNeedsDisplay()
     }

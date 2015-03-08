@@ -24,11 +24,12 @@ class MainViewController: UIViewController, LineChartDelegate {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[label]-|", options: nil, metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-80-[label]", options: nil, metrics: nil, views: views))
         
-        var data: [CGFloat] = [3, 4, -4, 11, 13, 15]
+        var data: [CGFloat] = [3, 4, -2, 11, 13, 15]
 //        var data2: [CGFloat] = [1, 3, 5, 13, 17, 20]
         
         lineChart = LineChart()
         lineChart.areaUnderLinesVisible = true
+        lineChart.labelsXVisible = true
         lineChart.addLine(data)
 //        lineChart!.addLine(data2)
         lineChart.setTranslatesAutoresizingMaskIntoConstraints(false)
@@ -48,11 +49,11 @@ class MainViewController: UIViewController, LineChartDelegate {
 //            self.lineChart!.addLine(data2)
 //        });
         
-        var scale = LinearScale(domain: [0, 100], range: [0.0, 100.0])
-        var linear = scale.scale()
-        var invert = scale.invert()
-        println(linear(x: 2.5)) // 50
-        println(invert(x: 50)) // 2.5
+//        var scale = LinearScale(domain: [0, 100], range: [0.0, 100.0])
+//        var linear = scale.scale()
+//        var invert = scale.invert()
+//        println(linear(x: 2.5)) // 50
+//        println(invert(x: 50)) // 2.5
         
     }
     

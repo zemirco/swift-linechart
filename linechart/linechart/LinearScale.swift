@@ -21,28 +21,28 @@ public class LinearScale {
     
     private func interpolate(a: CGFloat, b: CGFloat) -> (c: CGFloat) -> CGFloat {
         var diff = b - a
-        func test(c: CGFloat) -> CGFloat {
+        func f(c: CGFloat) -> CGFloat {
             return (a + diff) * c
         }
-        return test
+        return f
     }
     
     private func uninterpolate(a: CGFloat, b: CGFloat) -> (c: CGFloat) -> CGFloat {
         var diff = b - a
         var re = diff != 0 ? 1 / diff : 0
-        func test(c: CGFloat) -> CGFloat {
+        func f(c: CGFloat) -> CGFloat {
             return (c - a) * re
         }
-        return test
+        return f
     }
     
     private func bilinear(domain: [CGFloat], range: [CGFloat], uninterpolate: (a: CGFloat, b: CGFloat) -> (c: CGFloat) -> CGFloat, interpolate: (a: CGFloat, b: CGFloat) -> (c: CGFloat) -> CGFloat) -> (c: CGFloat) -> CGFloat {
         var u: (c: CGFloat) -> CGFloat = uninterpolate(a: domain[0], b: domain[1])
         var i: (c: CGFloat) -> CGFloat = interpolate(a: range[0], b: range[1])
-        func test(d: CGFloat) -> CGFloat {
+        func f(d: CGFloat) -> CGFloat {
             return i(c: u(c: d))
         }
-        return test
+        return f
     }
     
 }

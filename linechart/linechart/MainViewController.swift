@@ -30,6 +30,7 @@ class MainViewController: UIViewController, LineChartDelegate {
         lineChart = LineChart()
         lineChart.areaUnderLinesVisible = true
         lineChart.labelsXVisible = true
+        lineChart.labelsYVisible = true
         lineChart.addLine(data)
 //        lineChart!.addLine(data2)
         lineChart.setTranslatesAutoresizingMaskIntoConstraints(false)

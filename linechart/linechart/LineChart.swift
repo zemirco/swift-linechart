@@ -62,24 +62,32 @@ class LineChart: UIView {
     var innerRadius: CGFloat = 8
     var outerRadiusHighlighted: CGFloat = 12
     var innerRadiusHighlighted: CGFloat = 8
-    var axisInset: CGFloat = 10
+    var axisInset: CGFloat = 15
     
     private var xScale: ((CGFloat) -> CGFloat)!
     private var xInvert: ((CGFloat) -> CGFloat)!
+    private var xTicks: (CGFloat, CGFloat, CGFloat)!
+    
     private var yScale: ((CGFloat) -> CGFloat)!
+    private var yTicks: (CGFloat, CGFloat, CGFloat)!
+
     
     // values calculated on init
     var drawingHeight: CGFloat = 0 {
         didSet {
             var data = dataStore[0]
-            yScale = LinearScale(domain: [minElement(data), maxElement(data)], range: [0, drawingHeight]).scale()
+            var scale = LinearScale(domain: [minElement(data), maxElement(data)], range: [0, drawingHeight])
+            yScale = scale.scale()
+            yTicks = scale.ticks(10)
         }
     }
     var drawingWidth: CGFloat = 0 {
         didSet {
             var data = dataStore[0]
-            xScale = LinearScale(domain: [0.0, CGFloat(count(data) - 1)], range: [0, drawingWidth]).scale()
-            xInvert = LinearScale(domain: [0.0, CGFloat(count(data) - 1)], range: [0, drawingWidth]).invert()
+            var scale = LinearScale(domain: [0.0, CGFloat(count(data) - 1)], range: [0, drawingWidth])
+            xScale = scale.scale()
+            xInvert = scale.invert()
+            xTicks = scale.ticks(10)
         }
     }
     
@@ -355,16 +363,16 @@ class LineChart: UIView {
     /**
      * Get maximum value in all arrays in data store.
      */
-    func getMaximumValue() -> CGFloat {
-        var max: CGFloat = 1
-        for data in dataStore {
-            var newMax = maxElement(data)
-            if newMax > max {
-                max = newMax
-            }
-        }
-        return max
-    }
+//    func getMaximumValue() -> CGFloat {
+//        var max: CGFloat = 1
+//        for data in dataStore {
+//            var newMax = maxElement(data)
+//            if newMax > max {
+//                max = newMax
+//            }
+//        }
+//        return max
+//    }
     
     
     
@@ -496,16 +504,14 @@ class LineChart: UIView {
      * Draw x grid.
      */
     func drawXGrid() {
-        var space = drawingWidth / numberOfGridLinesX
         gridColor.setStroke()
-        var path = UIBezierPath();
+        var path = UIBezierPath()
         var x: CGFloat
-        var y1: CGFloat
-        var y2: CGFloat
-        for index in 1...Int(numberOfGridLinesX) {
-            x = axisInset + (CGFloat(index) * space)
-            y1 = self.bounds.height - axisInset
-            y2 = axisInset
+        var y1: CGFloat = self.bounds.height - axisInset
+        var y2: CGFloat = axisInset
+        var (start, stop, step) = self.xTicks
+        for var i: CGFloat = start; i <= stop; i += step {
+            x = self.xScale(i) + axisInset
             path.moveToPoint(CGPoint(x: x, y: y1))
             path.addLineToPoint(CGPoint(x: x, y: y2))
         }
@@ -518,19 +524,14 @@ class LineChart: UIView {
      * Draw y grid.
      */
     func drawYGrid() {
-        var maximumYValue = getMaximumValue()
-        var step = Int(maximumYValue) / Int(numberOfGridLinesY)
-        step = step == 0 ? 1 : step
-        var height = drawingHeight / maximumYValue
         gridColor.setStroke()
-        var path = UIBezierPath();
-        var x1: CGFloat
-        var x2: CGFloat
+        var path = UIBezierPath()
+        var x1: CGFloat = axisInset
+        var x2: CGFloat = self.bounds.width - axisInset
         var y: CGFloat
-        for var index = 0; index <= Int(maximumYValue); index += step {
-            x1 = axisInset
-            x2 = self.bounds.width - axisInset
-            y = self.bounds.height - (CGFloat(index) * height) - axisInset
+        var (start, stop, step) = self.yTicks
+        for var i: CGFloat = start; i <= stop; i += step {
+            y = self.bounds.height - self.yScale(i) - axisInset
             path.moveToPoint(CGPoint(x: x1, y: y))
             path.addLineToPoint(CGPoint(x: x2, y: y))
         }
@@ -554,9 +555,9 @@ class LineChart: UIView {
      */
     func drawXLabels() {
         var xAxisData = self.dataStore[0]
+        var y = self.bounds.height - axisInset
         for (index, value) in enumerate(xAxisData) {
             var x = self.xScale(CGFloat(index)) + (axisInset / 2)
-            var y = self.bounds.height - axisInset
             var label = UILabel(frame: CGRect(x: x, y: y, width: axisInset, height: axisInset))
             label.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCaption2)
             label.textAlignment = .Center
@@ -571,16 +572,14 @@ class LineChart: UIView {
      * Draw y labels.
      */
     func drawYLabels() {
-        var maximumYValue = getMaximumValue()
-        var step = Int(maximumYValue) / Int(numberOfGridLinesY)
-        step = step == 0 ? 1 : step
-        var height = drawingHeight / maximumYValue
-        for var index = 0; index <= Int(maximumYValue); index += step {
-            var yValue = self.bounds.height - (CGFloat(index) * height) - (axisInset * 1.5)
+        var yValue: CGFloat
+        var (start, stop, step) = self.yTicks
+        for var i: CGFloat = start; i <= stop; i += step {
+            yValue = self.bounds.height - self.yScale(i) - (axisInset * 1.5)
             var label = UILabel(frame: CGRect(x: 0, y: yValue, width: axisInset, height: axisInset))
-            label.font = UIFont.systemFontOfSize(10)
-            label.textAlignment = NSTextAlignment.Center
-            label.text = String(index)
+            label.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCaption2)
+            label.textAlignment = .Center
+            label.text = String(Int(round(i)))
             self.addSubview(label)
         }
     }

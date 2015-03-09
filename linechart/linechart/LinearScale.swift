@@ -19,6 +19,42 @@ public class LinearScale {
         return bilinear(range, range: domain, uninterpolate: uninterpolate, interpolate: interpolate)
     }
     
+    public func ticks(m: Int) -> (CGFloat, CGFloat, CGFloat) {
+        return scale_linearTicks(domain, m: m)
+    }
+    
+    private func scale_linearTicks(domain: [CGFloat], m: Int) -> (CGFloat, CGFloat, CGFloat) {
+        return scale_linearTickRange(domain, m: m)
+    }
+    
+    private func scale_linearTickRange(domain: [CGFloat], m: Int) -> (CGFloat, CGFloat, CGFloat) {
+        var extent = scaleExtent(domain)
+        var span = extent[1] - extent[0]
+        var step = CGFloat(pow(10, floor(log(Double(span) / Double(m)) / M_LN10)))
+        var err = CGFloat(m) / span * step
+    
+        // Filter ticks to get closer to the desired count.
+        if (err <= 0.15) {
+            step *= 10
+        } else if (err <= 0.35) {
+            step *= 5
+        } else if (err <= 0.75) {
+            step *= 2
+        }
+    
+        // Round start and stop values to step interval.
+        var start = ceil(extent[0] / step) * step
+        var stop = floor(extent[1] / step) * step + step * 0.5 // inclusive
+        
+        return (start, stop, step)
+    }
+    
+    private func scaleExtent(domain: [CGFloat]) -> [CGFloat] {
+        var start = domain[0]
+        var stop = domain[count(domain) - 1]
+        return start < stop ? [start, stop] : [stop, start]
+    }
+    
     private func interpolate(a: CGFloat, b: CGFloat) -> (c: CGFloat) -> CGFloat {
         var diff = b - a
         func f(c: CGFloat) -> CGFloat {

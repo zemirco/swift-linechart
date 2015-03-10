@@ -6,61 +6,43 @@ import QuartzCore
 
 
 
-// make Arrays substractable
-func - (left: [CGFloat], right: [CGFloat]) -> [CGFloat] {
-    var result: [CGFloat] = []
-    for index in 0..<left.count {
-        var difference = left[index] - right[index]
-        result.append(difference)
-    }
-    return result
-}
-
-
-
 // delegate method
-protocol LineChartDelegate {
+public protocol LineChartDelegate {
     func didSelectDataPoint(x: CGFloat, yValues: [CGFloat])
 }
 
 
 
 // LineChart class
-class LineChart: UIView {
+public class LineChart: UIView {
     
     // default configuration
-    var gridVisible = true
-    var axesVisible = true
-    var dotsVisible = true
-    var labelsXVisible = false
-    var labelsYVisible = false
-    var areaUnderLinesVisible = false
-    var numberOfGridLinesX: CGFloat = 10
-    var numberOfGridLinesY: CGFloat = 10
-    var animationEnabled = true
-    var animationDuration: CFTimeInterval = 1
+    public var gridVisible = true
+    public var axesVisible = true
+    public var dotsVisible = true
+    public var labelsXVisible = false
+    public var labelsYVisible = false
+    public var areaUnderLinesVisible = false
+    public var numberOfGridLinesX: CGFloat = 10
+    public var numberOfGridLinesY: CGFloat = 10
+    public var animationEnabled = true
+    public var animationDuration: CFTimeInterval = 1
     
-    var dotsBackgroundColor = UIColor.whiteColor()
+    public var dotsBackgroundColor = UIColor.whiteColor()
     
     // #eeeeee
-    var gridColor = UIColor(red: 238/255.0, green: 238/255.0, blue: 238/255.0, alpha: 1)
+    public var gridColor = UIColor(red: 238/255.0, green: 238/255.0, blue: 238/255.0, alpha: 1)
     
     // #607d8b
-    var axesColor = UIColor(red: 96/255.0, green: 125/255.0, blue: 139/255.0, alpha: 1)
-    
-    // #f69988
-    var positiveAreaColor = UIColor(red: 246/255.0, green: 153/255.0, blue: 136/255.0, alpha: 1)
-    
-    // #72d572
-    var negativeAreaColor = UIColor(red: 114/255.0, green: 213/255.0, blue: 114/255.0, alpha: 1)
+    public var axesColor = UIColor(red: 96/255.0, green: 125/255.0, blue: 139/255.0, alpha: 1)
     
     // sizes
-    var lineWidth: CGFloat = 2
-    var outerRadius: CGFloat = 12
-    var innerRadius: CGFloat = 8
-    var outerRadiusHighlighted: CGFloat = 12
-    var innerRadiusHighlighted: CGFloat = 8
-    var axisInset: CGFloat = 15
+    public var lineWidth: CGFloat = 2
+    public var outerRadius: CGFloat = 12
+    public var innerRadius: CGFloat = 8
+    public var outerRadiusHighlighted: CGFloat = 12
+    public var innerRadiusHighlighted: CGFloat = 8
+    public var axisInset: CGFloat = 15
     
     private var xScale: ((CGFloat) -> CGFloat)!
     private var xInvert: ((CGFloat) -> CGFloat)!
@@ -71,7 +53,7 @@ class LineChart: UIView {
 
     
     // values calculated on init
-    var drawingHeight: CGFloat = 0 {
+    private var drawingHeight: CGFloat = 0 {
         didSet {
             var data = dataStore[0]
             var scale = LinearScale(domain: [minElement(data), maxElement(data)], range: [0, drawingHeight])
@@ -79,7 +61,7 @@ class LineChart: UIView {
             yTicks = scale.ticks(10)
         }
     }
-    var drawingWidth: CGFloat = 0 {
+    private var drawingWidth: CGFloat = 0 {
         didSet {
             var data = dataStore[0]
             var scale = LinearScale(domain: [0.0, CGFloat(count(data) - 1)], range: [0, drawingWidth])
@@ -89,21 +71,21 @@ class LineChart: UIView {
         }
     }
     
-    var delegate: LineChartDelegate?
+    public var delegate: LineChartDelegate?
     
     // data stores
-    var dataStore: [[CGFloat]] = []
+    private var dataStore: [[CGFloat]] = []
     
     
     
-    var dotsDataStore: [[DotCALayer]] = []
-    var lineLayerStore: [CAShapeLayer] = []
-    var colors: [UIColor] = []
+    private var dotsDataStore: [[DotCALayer]] = []
+    private var lineLayerStore: [CAShapeLayer] = []
+    private var colors: [UIColor] = []
     
-    var removeAll: Bool = false
+    public var removeAll: Bool = false
     
     
-    override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
         
         self.backgroundColor = UIColor.clearColor()
@@ -124,17 +106,16 @@ class LineChart: UIView {
     }
     
     
-    
     convenience override init() {
         self.init(frame: CGRectZero)
     }
     
-    required init(coder aDecoder: NSCoder) {
+    required public init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
     
-    override func drawRect(rect: CGRect) {
+    override public func drawRect(rect: CGRect) {
         
         if removeAll {
             var context = UIGraphicsGetCurrentContext()
@@ -194,7 +175,7 @@ class LineChart: UIView {
     /**
      * Convert hex color to UIColor
      */
-    func UIColorFromHex(hex: Int) -> UIColor {
+    private func UIColorFromHex(hex: Int) -> UIColor {
         var red = CGFloat((hex & 0xFF0000) >> 16) / 255.0
         var green = CGFloat((hex & 0xFF00) >> 8) / 255.0
         var blue = CGFloat((hex & 0xFF)) / 255.0
@@ -206,7 +187,7 @@ class LineChart: UIView {
     /**
      * Lighten color.
      */
-    func lightenUIColor(color: UIColor) -> UIColor {
+    private func lightenUIColor(color: UIColor) -> UIColor {
         var h: CGFloat = 0
         var s: CGFloat = 0
         var b: CGFloat = 0
@@ -220,7 +201,7 @@ class LineChart: UIView {
     /**
      * Get y value for given x value. Or return zero or maximum value.
      */
-    func getYValuesForXValue(x: Int) -> [CGFloat] {
+    private func getYValuesForXValue(x: Int) -> [CGFloat] {
         var result: [CGFloat] = []
         for lineData in dataStore {
             if x < 0 {
@@ -239,7 +220,7 @@ class LineChart: UIView {
     /**
      * Handle touch events.
      */
-    func handleTouchEvents(touches: NSSet!, event: UIEvent) {
+    private func handleTouchEvents(touches: NSSet!, event: UIEvent) {
         if (self.dataStore.isEmpty) {
             return
         }
@@ -257,7 +238,7 @@ class LineChart: UIView {
     /**
      * Listen on touch end event.
      */
-    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
+    override public func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
         handleTouchEvents(touches, event: event)
     }
     
@@ -266,7 +247,7 @@ class LineChart: UIView {
     /**
      * Listen on touch move event
      */
-    override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent) {
+    override public func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent) {
         handleTouchEvents(touches, event: event)
     }
     
@@ -275,7 +256,7 @@ class LineChart: UIView {
     /**
      * Highlight data points at index.
      */
-    func highlightDataPoints(index: Int) {
+    private func highlightDataPoints(index: Int) {
         for (lineIndex, dotsData) in enumerate(dotsDataStore) {
             // make all dots white again
             for dot in dotsData {
@@ -299,7 +280,7 @@ class LineChart: UIView {
     /**
      * Draw small dot at every data point.
      */
-    func drawDataDots(lineIndex: Int) {
+    private func drawDataDots(lineIndex: Int) {
         var dots: [DotCALayer] = []
         var data = self.dataStore[lineIndex]
         
@@ -335,7 +316,7 @@ class LineChart: UIView {
     /**
      * Draw x and y axis.
      */
-    func drawAxes() {
+    private func drawAxes() {
         var height = self.bounds.height
         var width = self.bounds.width
         var path = UIBezierPath()
@@ -370,24 +351,9 @@ class LineChart: UIView {
     
     
     /**
-     * Scale data to fit drawing height.
-     */
-//    func scaleDataYAxis(data: [CGFloat]) -> [CGFloat] {
-//        var maximumYValue = getMaximumValue()
-//        var factor = drawingHeight / maximumYValue
-//        var scaledDataYAxis = data.map({datum -> CGFloat in
-//            var newYValue = datum * factor
-//            return newYValue
-//            })
-//        return scaledDataYAxis
-//    }
-    
-    
-    
-    /**
      * Draw line.
      */
-    func drawLine(lineIndex: Int) {
+    private func drawLine(lineIndex: Int) {
         
         var data = self.dataStore[lineIndex]
         var path = UIBezierPath()
@@ -426,7 +392,7 @@ class LineChart: UIView {
     /**
      * Fill area between line chart and x-axis.
      */
-    func drawAreaBeneathLineChart(lineIndex: Int) {
+    private func drawAreaBeneathLineChart(lineIndex: Int) {
         
         var data = self.dataStore[lineIndex]
         var path = UIBezierPath()
@@ -454,7 +420,7 @@ class LineChart: UIView {
     /**
      * Draw x grid.
      */
-    func drawXGrid() {
+    private func drawXGrid() {
         gridColor.setStroke()
         var path = UIBezierPath()
         var x: CGFloat
@@ -474,7 +440,7 @@ class LineChart: UIView {
     /**
      * Draw y grid.
      */
-    func drawYGrid() {
+    private func drawYGrid() {
         gridColor.setStroke()
         var path = UIBezierPath()
         var x1: CGFloat = axisInset
@@ -494,7 +460,7 @@ class LineChart: UIView {
     /**
      * Draw grid.
      */
-    func drawGrid() {
+    private func drawGrid() {
         drawXGrid()
         drawYGrid()
     }
@@ -504,7 +470,7 @@ class LineChart: UIView {
     /**
      * Draw x labels.
      */
-    func drawXLabels() {
+    private func drawXLabels() {
         var xAxisData = self.dataStore[0]
         var y = self.bounds.height - axisInset
         for (index, value) in enumerate(xAxisData) {
@@ -522,7 +488,7 @@ class LineChart: UIView {
     /**
      * Draw y labels.
      */
-    func drawYLabels() {
+    private func drawYLabels() {
         var yValue: CGFloat
         var (start, stop, step) = self.yTicks
         for var i: CGFloat = start; i <= stop; i += step {
@@ -540,7 +506,7 @@ class LineChart: UIView {
     /**
      * Add line chart
      */
-    func addLine(data: [CGFloat]) {
+    public func addLine(data: [CGFloat]) {
         self.dataStore.append(data)
         self.setNeedsDisplay()
     }
@@ -549,7 +515,7 @@ class LineChart: UIView {
     /**
      * Make whole thing white again.
      */
-    func clearAll() {
+    public func clearAll() {
         self.removeAll = true
         clear()
         self.setNeedsDisplay()
@@ -561,7 +527,7 @@ class LineChart: UIView {
     /**
      * Remove charts, areas and labels but keep axis and grid.
      */
-    func clear() {
+    public func clear() {
         // clear data
         dataStore.removeAll()
         self.setNeedsDisplay()

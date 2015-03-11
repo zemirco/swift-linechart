@@ -103,8 +103,9 @@ public class LineChart: UIView {
     // values calculated on init
     private var drawingHeight: CGFloat = 0 {
         didSet {
-            var data = dataStore[0]
-            var scale = LinearScale(domain: [minElement(data), maxElement(data)], range: [0, drawingHeight])
+            var max = getMaximumValue()
+            var min = getMinimumValue()
+            var scale = LinearScale(domain: [min, max], range: [0, drawingHeight])
             yScale = scale.scale()
             yTicks = scale.ticks(10)
         }
@@ -151,7 +152,7 @@ public class LineChart: UIView {
     
     required public init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-    }    
+    }
     
     override public func drawRect(rect: CGRect) {
         
@@ -349,16 +350,32 @@ public class LineChart: UIView {
     /**
      * Get maximum value in all arrays in data store.
      */
-//    func getMaximumValue() -> CGFloat {
-//        var max: CGFloat = 1
-//        for data in dataStore {
-//            var newMax = maxElement(data)
-//            if newMax > max {
-//                max = newMax
-//            }
-//        }
-//        return max
-//    }
+    private func getMaximumValue() -> CGFloat {
+        var max: CGFloat = 1
+        for data in dataStore {
+            var newMax = maxElement(data)
+            if newMax > max {
+                max = newMax
+            }
+        }
+        return max
+    }
+    
+    
+    
+    /**
+     * Get maximum value in all arrays in data store.
+     */
+    private func getMinimumValue() -> CGFloat {
+        var min: CGFloat = 0
+        for data in dataStore {
+            var newMin = minElement(data)
+            if newMin < min {
+                min = newMin
+            }
+        }
+        return min
+    }
     
     
     
@@ -399,6 +416,7 @@ public class LineChart: UIView {
         // add line layer to store
         lineLayerStore.append(layer)
     }
+    
     
     
     /**

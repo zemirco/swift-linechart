@@ -34,15 +34,16 @@ class MainViewController: UIViewController, LineChartDelegate {
         lineChart = LineChart()
         lineChart.animation.enabled = true
         lineChart.area = true
-        lineChart.x.labels.visibile = true
+        lineChart.x.labels.visible = true
+        lineChart.x.grid.count = 5
+        lineChart.y.grid.count = 5
         lineChart.x.labels.values = xLabels
-        lineChart.y.labels.visibile = true
+        lineChart.y.labels.visible = true
         lineChart.addLine(data)
         lineChart.addLine(data2)
+        
         lineChart.setTranslatesAutoresizingMaskIntoConstraints(false)
         lineChart.delegate = self
-        lineChart.layer.borderColor = UIColor.blueColor().CGColor
-        lineChart.layer.borderWidth = 1
         self.view.addSubview(lineChart)
         views["chart"] = lineChart
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[chart]-|", options: nil, metrics: nil, views: views))
@@ -52,8 +53,8 @@ class MainViewController: UIViewController, LineChartDelegate {
 //        var time = dispatch_time(DISPATCH_TIME_NOW, delta)
 //        
 //        dispatch_after(time, dispatch_get_main_queue(), {
-//            self.lineChart!.clear()
-//            self.lineChart!.addLine(data2)
+//            self.lineChart.clear()
+//            self.lineChart.addLine(data2)
 //        });
         
 //        var scale = LinearScale(domain: [0, 100], range: [0.0, 100.0])

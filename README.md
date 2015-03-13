@@ -15,35 +15,69 @@ lineChart.addLine([3, 4, 9, 11, 13, 15])
 - Highly customizable
 - Auto scaling
 - Touch enabled
-- Two-colored area between line charts
+- Area below lines
 
 ## Properties
 
-- `gridVisible` Show or hide grid. Default `true`.
-- `axesVisible` Show or hide x and y axes. Default `true`.
-- `dotsVisible` Show tiny dots at data points. Default `true`.
-- `labelsXVisible` Show labels on x axis. Default `false`.
-- `labelsYVisible` Show labels on y axis. Default `false`.
-- `numberOfGridLinesX` Number of grid lines in horizontal direction. Default `10`.
-- `numberOfGridLinesY` Number of grid lines in vertical direction. Default `10`.
-- `animationEnabled` Draw line and dots with animation. Default `true`.
-- `animationDuration` Animation duration. Default `1`.
-- `dotsBackgroundColor` Tiny dots background color. Default white.
-- `gridColor` Grid color. Default light grey.
-- `axesColor` Axes color. Default grey.
-- `positiveAreaColor` Filled area color when line A > line B. Default light green.
-- `negativeAreaColor` Filled area color when line A < line B. Default light red.
-- `areaBetweenLines` Draw filled area between lines with those two indexes. Default `[-1, -1]`
-- `lineWidth` Line width. Default `2`.
-- `dotsSize` Dot size. Default `12`.
-- `dotsBorderWidth` Dot border width. Default `4`.
-- `axisInset` Padding between view border and chart axes. Default `10`.
+Both `x` and `y` properties are of type `Coordinate`.
+Each can be customized separately and has its own settings for labels, gridlines and axis.
+
+- `labels`: Labels
+- `grid`: Grid
+- `axis`: Axis
+
+`Labels` can be switched on and off and they can have custom values.
+
+- `visible`: Bool = `true`
+- `values`: [String] = `[]`
+
+`Grid` can also be switched on/off, has a custom color and you can specify how many gridlines
+you'd like to show.
+
+- `visible`: Bool = `true`
+- `count`: CGFloat = `10`
+- `color`: UIColor = `UIColor(red: 238/255.0, green: 238/255.0, blue: 238/255.0, alpha: 1) // #eeeeee`
+
+`Axis` can be switched on/off, has a property to its color and you can specify how much the axis
+is inset from the border of your UIView.
+
+- `visible`: Bool = `true`
+- `color`: UIColor = `UIColor(red: 96/255.0, green: 125/255.0, blue: 139/255.0, alpha: 1) // 607d8b`
+- `inset`: CGFloat = `15`
+
+Animations can be customized through the `Animation` settings.
+
+- `enabled`: Bool = `true`
+- `duration`: CFTimeInterval = `1`
+
+If you'd like to show extra dots at your data points use the `Dots` features.
+
+- `visible`: Bool = `true`
+- `color`: UIColor = `UIColor.whiteColor()`
+- `innerRadius`: CGFloat = `8`
+- `outerRadius`: CGFloat = `12`
+- `innerRadiusHighlighted`: CGFloat = `8`
+- `outerRadiusHighlighted`: CGFloat = `12`
+
+In addition to the above mentioned features you can further customize your chart.
+
+- `area`: Bool = `true` - Fill the area between line and x axis
+- `lineWidth`: CGFloat = `2` - Set the line width
+- `colors`: [UIColor] = `[...]` - Colors for your line charts
 
 ## Methods
 
 Add line to chart.
 
-`lineChart.addLine(data: Array<CGFloat>)`
+  `lineChart.addLine(data: [CGFloat])`
+
+Remove charts, areas and labels but keep axis and grid.
+
+  `lineChart.clear()`
+
+Make whole UIView white again
+
+  `lineChart.clearAll()`
 
 ## Delegates
 
@@ -52,7 +86,7 @@ Add line to chart.
 Touch event happened at or close to data point.
 
 ```swift
-func didSelectDataPoint(x: CGFloat, yValues: Array<CGFloat>) {
+func didSelectDataPoint(x: CGFloat, yValues: [CGFloat]) {
   println("\(x) and \(yValues)")
 }
 ```
@@ -74,22 +108,14 @@ lineChart.addLine([3, 4, 9, 11, 13, 15])
 
 ```swift
 var lineChart = LineChart()
-lineChart.gridVisible = false
-lineChart.dotsVisible = false
+lineChart.area = false
+lineChart.x.grid.visible = false
+lineChart.x.labels.visible = false
+lineChart.y.grid.visible = false
+lineChart.y.labels.visible = false
+lineChart.dots.visible = false
 lineChart.addLine([3, 4, 9, 11, 13, 15])
 lineChart.addLine([5, 4, 3, 6, 6, 7])
-```
-
-#### Area with positive and negative values between two line charts.
-
-![area between two lines](https://s3.amazonaws.com/zeMirco/github/swift-linechart/03.png)
-
-```swift
-var lineChart = LineChart()
-lineChart.dotsVisible = false
-lineChart.addLine([3, 4, 9, 11, 13, 15])
-lineChart.addLine([5, 4, 3, 6, 6, 7])
-lineChart.areaBetweenLines = [0, 1]
 ```
 
 #### Show x and y axis
@@ -98,13 +124,11 @@ lineChart.areaBetweenLines = [0, 1]
 
 ```swift
 var lineChart = LineChart()
+lineChart.area = false
+lineChart.x.grid.count = 5
+lineChart.y.grid.count = 5
 lineChart.addLine([3, 4, 9, 11, 13, 15])
 lineChart.addLine([5, 4, 3, 6, 6, 7])
-lineChart.axisInset = 20
-lineChart.labelsXVisible = true
-lineChart.numberOfGridLinesX = 5
-lineChart.labelsYVisible = true
-lineChart.numberOfGridLinesY = 5
 ```
 
 

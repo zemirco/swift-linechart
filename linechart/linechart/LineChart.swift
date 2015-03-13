@@ -42,7 +42,7 @@ public protocol LineChartDelegate {
 }
 
 public struct Labels {
-    public var visibile: Bool = true
+    public var visible: Bool = true
     public var values: [String] = []
 }
 
@@ -98,7 +98,6 @@ public class LineChart: UIView {
     public var area: Bool = true
     public var animation: Animation = Animation()
     public var dots: Dots = Dots()
-    public var removeAll: Bool = false
     public var lineWidth: CGFloat = 2
     
     public var x: Coordinate = Coordinate()
@@ -112,7 +111,7 @@ public class LineChart: UIView {
             var min = getMinimumValue()
             y.linear = LinearScale(domain: [min, max], range: [0, drawingHeight])
             y.scale = y.linear.scale()
-            y.ticks = y.linear.ticks(10)
+            y.ticks = y.linear.ticks(Int(y.grid.count))
         }
     }
     private var drawingWidth: CGFloat = 0 {
@@ -121,7 +120,7 @@ public class LineChart: UIView {
             x.linear = LinearScale(domain: [0.0, CGFloat(count(data) - 1)], range: [0, drawingWidth])
             x.scale = x.linear.scale()
             x.invert = x.linear.invert()
-            x.ticks = x.linear.ticks(10)
+            x.ticks = x.linear.ticks(Int(x.grid.count))
         }
     }
     
@@ -131,6 +130,8 @@ public class LineChart: UIView {
     private var dataStore: [[CGFloat]] = []
     private var dotsDataStore: [[DotCALayer]] = []
     private var lineLayerStore: [CAShapeLayer] = []
+    
+    private var removeAll: Bool = false
     
     // category10 colors from d3 - https://github.com/mbostock/d3/wiki/Ordinal-Scales
     public var colors: [UIColor] = [
@@ -196,8 +197,8 @@ public class LineChart: UIView {
         if x.axis.visible && y.axis.visible { drawAxes() }
         
         // draw labels
-        if x.labels.visibile { drawXLabels() }
-        if y.labels.visibile { drawYLabels() }
+        if x.labels.visible { drawXLabels() }
+        if y.labels.visible { drawYLabels() }
         
         // draw lines
         for (lineIndex, lineData) in enumerate(dataStore) {

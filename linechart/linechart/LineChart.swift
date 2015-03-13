@@ -43,7 +43,7 @@ public protocol LineChartDelegate {
 
 public struct Labels {
     public var visibile: Bool = true
-    public var values: [CGFloat] = []
+    public var values: [String] = []
 }
 
 public struct Grid {
@@ -67,6 +67,7 @@ public struct Coordinate {
     public var axis: Axis = Axis()
     
     // private
+    private var linear: LinearScale!
     private var scale: ((CGFloat) -> CGFloat)!
     private var invert: ((CGFloat) -> CGFloat)!
     private var ticks: (CGFloat, CGFloat, CGFloat)!
@@ -109,18 +110,18 @@ public class LineChart: UIView {
         didSet {
             var max = getMaximumValue()
             var min = getMinimumValue()
-            var scale = LinearScale(domain: [min, max], range: [0, drawingHeight])
-            y.scale = scale.scale()
-            y.ticks = scale.ticks(10)
+            y.linear = LinearScale(domain: [min, max], range: [0, drawingHeight])
+            y.scale = y.linear.scale()
+            y.ticks = y.linear.ticks(10)
         }
     }
     private var drawingWidth: CGFloat = 0 {
         didSet {
             var data = dataStore[0]
-            var scale = LinearScale(domain: [0.0, CGFloat(count(data) - 1)], range: [0, drawingWidth])
-            x.scale = scale.scale()
-            x.invert = scale.invert()
-            x.ticks = scale.ticks(10)
+            x.linear = LinearScale(domain: [0.0, CGFloat(count(data) - 1)], range: [0, drawingWidth])
+            x.scale = x.linear.scale()
+            x.invert = x.linear.invert()
+            x.ticks = x.linear.ticks(10)
         }
     }
     
@@ -508,12 +509,21 @@ public class LineChart: UIView {
     private func drawXLabels() {
         var xAxisData = self.dataStore[0]
         var y = self.bounds.height - x.axis.inset
+        var (start, stop, step) = x.linear.ticks(xAxisData.count)
+        var width = x.scale(step)
+        
+        var text: String
         for (index, value) in enumerate(xAxisData) {
-            var xValue = self.x.scale(CGFloat(index)) + (x.axis.inset / 2)
-            var label = UILabel(frame: CGRect(x: xValue, y: y, width: x.axis.inset, height: x.axis.inset))
+            var xValue = self.x.scale(CGFloat(index)) + x.axis.inset - (width / 2)
+            var label = UILabel(frame: CGRect(x: xValue, y: y, width: width, height: x.axis.inset))
             label.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCaption2)
             label.textAlignment = .Center
-            label.text = String(index)
+            if (x.labels.values.count != 0) {
+                text = x.labels.values[index]
+            } else {
+                text = String(index)
+            }
+            label.text = text
             self.addSubview(label)
         }
     }

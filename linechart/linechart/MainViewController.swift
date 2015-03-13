@@ -29,18 +29,13 @@ class MainViewController: UIViewController, LineChartDelegate {
         var data2: [CGFloat] = [1, 3, 5, 13, 17, 20]
         
         // simple line with custom x axis labels
-        var xLabels: [String] = [
-            "one",
-            "two",
-            "three",
-            "four",
-            "five"
-        ]
+        var xLabels: [String] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
         
         lineChart = LineChart()
         lineChart.animation.enabled = true
         lineChart.area = true
         lineChart.x.labels.visibile = true
+        lineChart.x.labels.values = xLabels
         lineChart.y.labels.visibile = true
         lineChart.addLine(data)
         lineChart.addLine(data2)

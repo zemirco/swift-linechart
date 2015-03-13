@@ -24,14 +24,24 @@ class MainViewController: UIViewController, LineChartDelegate {
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[label]-|", options: nil, metrics: nil, views: views))
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-80-[label]", options: nil, metrics: nil, views: views))
         
+        // simple arrays
         var data: [CGFloat] = [3, 4, -2, 11, 13, 15]
         var data2: [CGFloat] = [1, 3, 5, 13, 17, 20]
+        
+        // simple line with custom x axis labels
+        var xLabels: [String] = [
+            "one",
+            "two",
+            "three",
+            "four",
+            "five"
+        ]
         
         lineChart = LineChart()
         lineChart.animation.enabled = true
         lineChart.area = true
-        lineChart.labels.x = true
-        lineChart.labels.y = true
+        lineChart.x.labels.visibile = true
+        lineChart.y.labels.visibile = true
         lineChart.addLine(data)
         lineChart.addLine(data2)
         lineChart.setTranslatesAutoresizingMaskIntoConstraints(false)

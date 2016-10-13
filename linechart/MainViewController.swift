@@ -18,11 +18,11 @@ class MainViewController: UIViewController, LineChartDelegate {
         
         label.text = "..."
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textAlignment = NSTextAlignment.Center
+        label.textAlignment = NSTextAlignment.center
         self.view.addSubview(label)
         views["label"] = label
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[label]-|", options: [], metrics: nil, views: views))
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-80-[label]", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-[label]-|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-80-[label]", options: [], metrics: nil, views: views))
         
         // simple arrays
         let data: [CGFloat] = [3, 4, -2, 11, 13, 15]
@@ -46,8 +46,8 @@ class MainViewController: UIViewController, LineChartDelegate {
         lineChart.delegate = self
         self.view.addSubview(lineChart)
         views["chart"] = lineChart
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[chart]-|", options: [], metrics: nil, views: views))
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:[label]-[chart(==200)]", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-[chart]-|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:[label]-[chart(==200)]", options: [], metrics: nil, views: views))
         
 //        var delta: Int64 = 4 * Int64(NSEC_PER_SEC)
 //        var time = dispatch_time(DISPATCH_TIME_NOW, delta)
@@ -76,7 +76,7 @@ class MainViewController: UIViewController, LineChartDelegate {
     /**
      * Line chart delegate method.
      */
-    func didSelectDataPoint(x: CGFloat, yValues: Array<CGFloat>) {
+    func didSelectDataPoint(_ x: CGFloat, yValues: Array<CGFloat>) {
         label.text = "x: \(x)     y: \(yValues)"
     }
     
@@ -85,7 +85,7 @@ class MainViewController: UIViewController, LineChartDelegate {
     /**
      * Redraw chart on device rotation.
      */
-    override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
+    override func didRotate(from fromInterfaceOrientation: UIInterfaceOrientation) {
         if let chart = lineChart {
             chart.setNeedsDisplay()
         }

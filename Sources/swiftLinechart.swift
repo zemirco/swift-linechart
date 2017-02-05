@@ -15,13 +15,13 @@ public protocol LineChartDelegate {
 open class LineChart: UIView {
     
     /**
-    * Helpers class
-    */
+     * Helpers class
+     */
     fileprivate class Helpers {
         
         /**
-        * Convert hex color to UIColor
-        */
+         * Convert hex color to UIColor
+         */
         fileprivate class func UIColorFromHex(_ hex: Int) -> UIColor {
             let red = CGFloat((hex & 0xFF0000) >> 16) / 255.0
             let green = CGFloat((hex & 0xFF00) >> 8) / 255.0
@@ -30,8 +30,8 @@ open class LineChart: UIView {
         }
         
         /**
-        * Lighten color.
-        */
+         * Lighten color.
+         */
         fileprivate class func lightenUIColor(_ color: UIColor) -> UIColor {
             var h: CGFloat = 0
             var s: CGFloat = 0
@@ -96,7 +96,7 @@ open class LineChart: UIView {
     
     open var x: Coordinate = Coordinate()
     open var y: Coordinate = Coordinate()
-
+    
     
     // values calculated on init
     fileprivate var drawingHeight: CGFloat = 0 {
@@ -145,7 +145,7 @@ open class LineChart: UIView {
         super.init(frame: frame)
         self.backgroundColor = UIColor.clear
     }
-
+    
     convenience init() {
         self.init(frame: CGRect.zero)
     }

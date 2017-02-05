@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0600"
+   LastUpgradeVersion = "9999"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,77 +14,62 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C06F8E141962FFD7000AC9AF"
-               BuildableName = "linechart.app"
-               BlueprintName = "linechart"
-               ReferencedContainer = "container:linechart.xcodeproj">
+               BlueprintIdentifier = "OBJ_17"
+               BuildableName = "swiftLinechart.framework"
+               BlueprintName = "swiftLinechart"
+               ReferencedContainer = "container:swiftLinechart.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Debug">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C06F8E211962FFD7000AC9AF"
-               BuildableName = "linechartTests.xctest"
-               BlueprintName = "linechartTests"
-               ReferencedContainer = "container:linechart.xcodeproj">
+               BlueprintIdentifier = "OBJ_24"
+               BuildableName = "swiftLinechartTests.xctest"
+               BlueprintName = "swiftLinechartTests"
+               ReferencedContainer = "container:swiftLinechart.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C06F8E141962FFD7000AC9AF"
-            BuildableName = "linechart.app"
-            BlueprintName = "linechart"
-            ReferencedContainer = "container:linechart.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
+      <AdditionalOptions>
+      </AdditionalOptions>
    </TestAction>
    <LaunchAction
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Debug"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C06F8E141962FFD7000AC9AF"
-            BuildableName = "linechart.app"
-            BlueprintName = "linechart"
-            ReferencedContainer = "container:linechart.xcodeproj">
+            BlueprintIdentifier = "OBJ_17"
+            BuildableName = "swiftLinechart.framework"
+            BlueprintName = "swiftLinechart"
+            ReferencedContainer = "container:swiftLinechart.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
+      buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C06F8E141962FFD7000AC9AF"
-            BuildableName = "linechart.app"
-            BlueprintName = "linechart"
-            ReferencedContainer = "container:linechart.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
